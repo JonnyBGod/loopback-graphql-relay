@@ -31,7 +31,7 @@ function generateModelFields(models) {
   return modelFields;
 }
 
-module.exports = function (models, options) {
+module.exports = function index(models, options) {
   const fields = Object.assign(
     {},
     {

@@ -20,7 +20,7 @@ function getOptions(model, options, args) {
   return basicOpts;
 }
 
-module.exports = function (models, schema, pubsub) {
+module.exports = function subscriptionManager(models, schema, pubsub) {
   const setupFunctions = {};
 
   _.forEach(models, (model) => {

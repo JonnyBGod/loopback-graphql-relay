@@ -20,8 +20,7 @@ function defaultGetPayload(obj) {
   return (obj && obj.object) ? obj.object : null;
 }
 
-module.exports = function
-  subscriptionWithPayload({ modelName, subscribeAndGetPayload = defaultGetPayload, model }) {
+module.exports = function subscriptionWithPayload({ modelName, subscribeAndGetPayload = defaultGetPayload, model }) {
   const inputType = new GraphQLInputObjectType({
     name: `${modelName}SubscriptionInput`,
     fields: () => Object.assign(
@@ -92,7 +91,8 @@ module.exports = function
         try {
           loopbackPubSub.subscribe(info.fieldName, null, subscriptionPayload);
         } catch (ex) {
-          console.log(ex);
+          // eslint-disable-next-line no-console
+          console.error(ex);
         }
         return true;
       },

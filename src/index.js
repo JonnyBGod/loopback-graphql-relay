@@ -5,7 +5,7 @@ const { getSchema } = require('./schema/index');
 const startSubscriptionServer = require('./subscriptions');
 const patchChangeStream = require('./subscriptions/patchChangeStream');
 
-module.exports = function (app, options) {
+module.exports = function index(app, options) {
   const models = app.models();
 
   _.forEach(models, (model) => {
@@ -41,6 +41,7 @@ module.exports = function (app, options) {
   try {
     startSubscriptionServer(app, schema, options);
   } catch (ex) {
-    console.log(ex);
+    // eslint-disable-next-line no-console
+    console.error(ex);
   }
 };

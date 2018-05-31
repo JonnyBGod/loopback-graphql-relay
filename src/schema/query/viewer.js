@@ -78,7 +78,7 @@ function getMeField(User) {
  * Generates Viewer query
  * @param {*} models
  */
-module.exports = function (models, options) {
+module.exports = function viewer(models, options) {
   const opts = Object.assign({}, {
     AccessTokenModel: 'AccessToken',
     relation: 'user',

@@ -8,8 +8,8 @@ const { PassThrough } = require('stream');
  *
  * More Info here: https://github.com/strongloop/angular-live-set/issues/11
  */
-module.exports = function (PatchModel) {
-  PatchModel.createChangeStream = function (options, cb) {
+module.exports = function patchChangeStream(PatchModel) {
+  PatchModel.createChangeStream = function createChangeStream(options, cb) {
     /* Based on persisted-model#createChangeStream
      *
      * currentUser is being populated in server.js using tips from here:
@@ -27,7 +27,7 @@ module.exports = function (PatchModel) {
     let changes = new PassThrough({ objectMode: true });
     let writeable = true;
 
-    changes.destroy = function () {
+    changes.destroy = function destroy() {
       changes.removeAllListeners('error');
       changes.removeAllListeners('end');
       writeable = false;

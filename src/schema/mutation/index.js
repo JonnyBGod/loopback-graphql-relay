@@ -4,7 +4,7 @@ const { GraphQLObjectType } = require('graphql');
 
 const getRemoteMethods = require('./getRemoteMethodMutations');
 
-module.exports = function (models) {
+module.exports = function index(models) {
   const modelFields = {};
   _.forEach(models, (model) => {
     const fields = Object.assign({}, getRemoteMethods(model));

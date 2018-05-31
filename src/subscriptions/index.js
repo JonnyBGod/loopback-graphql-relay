@@ -7,7 +7,7 @@ const { execute, subscribe } = require('graphql');
 const bodyParser = require('body-parser');
 const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
 
-module.exports = function (app, schema, opts) {
+module.exports = function index(app, schema, opts) {
   const PORT = 3000;
 
   app.use('/graphiql', graphiqlExpress({
@@ -31,6 +31,7 @@ module.exports = function (app, schema, opts) {
       { execute, subscribe, schema },
       { server, path: '/subscriptions' },
     );
+    // eslint-disable-next-line no-console
     console.log(`GraphQL server running on port ${PORT}.`);
   });
 
@@ -62,7 +63,7 @@ module.exports = function (app, schema, opts) {
       response.end();
     });
   }
-
+  // eslint-disable-next-line no-console
   websocketServer.listen(WS_PORT, () => console.log(`Websocket Server is now running on http(s)://localhost:${WS_PORT}`));
 
   const validateToken = authToken => new Promise((resolve, reject) => {

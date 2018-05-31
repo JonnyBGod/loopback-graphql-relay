@@ -26,7 +26,7 @@ function addModel(model) {
   return fields;
 }
 
-module.exports = function (models) {
+module.exports = function subscriptions(models) {
   const fields = {};
   _.forEach(models, (model) => {
     if (!model.shared) {
