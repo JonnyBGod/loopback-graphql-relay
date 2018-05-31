@@ -1,4 +1,3 @@
-'use strict';
 
 const _ = require('lodash');
 
@@ -7,8 +6,8 @@ const {
 } = require('graphql-relay');
 
 const GeoPointTypeDefs = require('./GeoPoint');
-const {findRelatedOne, findRelatedMany} = require('../db');
-const {connectionFromPromisedArray} = require('../db/resolveConnection');
+const { findRelatedOne, findRelatedMany } = require('../db');
+const { connectionFromPromisedArray } = require('../db/resolveConnection');
 
 /** * Loopback Types - GraphQL types
         any - JSON
@@ -75,7 +74,7 @@ function mapProperty(model, property, modelName, propertyName, isInputType = fal
   let propertyType = property.type;
 
   // Add resolver
-  currentProperty.resolve = (obj, args, context) => (_.isNil(obj[propertyName]) ? null : obj[propertyName]);
+  currentProperty.resolve = obj => (_.isNil(obj[propertyName]) ? null : obj[propertyName]);
 
   // If it's an Array type, map it to JSON Scalar
   if (propertyType.name === 'Array') { // JSON Array
@@ -93,8 +92,18 @@ function mapProperty(model, property, modelName, propertyName, isInputType = fal
 
   // If property.type is an array, its a list type.
   if (_.isArray(property.type)) {
+    // console.log(property.type[0].name);
+
     currentProperty.meta.list = true;
-    propertyType = property.type[0];
+    // TODO: Its not a right way to do it. Need to Come up with a better approach.
+    // TODO: Loopback creates a model with name "Anonymous_" for properties which are of type Object OR Array.
+    // TODO: Theses Anonymous models are not accessable by app.models() method.
+    if (property.type[0].name.indexOf('Anony') !== -1) {
+      currentProperty.meta.type = 'JSON';
+    } else {
+      currentProperty.meta.type = property.type[0].name;
+    }
+    propertyType = property.type[0];// eslint-disable-line
   }
 
   // See if this property is a scalar.
@@ -120,9 +129,18 @@ function mapProperty(model, property, modelName, propertyName, isInputType = fal
       currentProperty.type = typeName;
     }
   }
-
+  if (!scalar && !_.isArray(property.type) && property.defaultFn !== 'now') {
+    // TODO: Its not a right way to do it. Need to Come up with a better approach.
+    // TODO: Loopback creates a model with name "Anonymous_" for properties which are of type Object OR Array.
+    // TODO: Theses Anonymous models are not accessable by app.models() method.
+    if (propertyType.name.indexOf('Anony') === -1) {
+      currentProperty.meta.type = propertyType.modelName;
+    } else {
+      currentProperty.meta.type = 'JSON';
+    }
+  }
   // If this property is another Model
-  if (propertyType.name === 'ModelConstructor' && property.defaultFn !== 'now') {
+  if (!scalar && propertyType.name && propertyType.name.indexOf('Anony') === -1 && property.defaultFn !== 'now') {
     currentProperty.meta.type = (!isInputType) ? propertyType.modelName : `${propertyType.modelName}Input`;
     const union = propertyType.modelName.split('|');
 
@@ -209,6 +227,10 @@ function mapRelation(rel, modelName, relName) {
   };
 }
 
+function sharedRelations(model) {
+  return _.pickBy(model.relations, rel => rel.modelTo && rel.modelTo.shared);
+}
+
 /**
  * Generates a definition for a single model type
  * @param {*} model
@@ -252,10 +274,6 @@ function mapInputType(model) {
   _.forEach(model.definition.properties, (property, key) => {
     mapProperty(model, property, modelName, key, true);
   });
-}
-
-function sharedRelations(model) {
-  return _.pickBy(model.relations, rel => rel.modelTo && rel.modelTo.shared);
 }
 
 function getTypeDef(name) {

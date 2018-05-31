@@ -1,8 +1,7 @@
-'use strict';
 
-const {GraphQLScalarType} = require('graphql');
-const {GraphQLError} = require('graphql/error');
-const {Kind} = require('graphql/language');
+const { GraphQLScalarType } = require('graphql');
+const { GraphQLError } = require('graphql/error');
+const { Kind } = require('graphql/language');
 
 module.exports = new GraphQLScalarType({
   name: 'DateTime',

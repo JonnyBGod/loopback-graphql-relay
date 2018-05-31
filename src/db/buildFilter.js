@@ -1,4 +1,3 @@
-'use strict';
 
 const _ = require('lodash');
 const utils = require('./utils');
@@ -6,19 +5,6 @@ const utils = require('./utils');
 /**
  * Inspired by https://www.reindex.io/blog/relay-graphql-pagination-with-mongodb/
  */
-module.exports = function buildFilter(model, args) {
-  const idName = (model.getIdName && model.getIdName()) ? model.getIdName() : 'id';
-
-  const filter = {
-    where: args.where || {},
-  };
-
-  sortFilter(filter, args.order, args.before, idName);
-  limitFilter(filter, args.before, args.after, null, idName);
-  applyPagination(filter, args.first, args.last, args.count);
-
-  return filter;
-};
 
 function sortFilter(filter, order, before, idName) {
   const end = utils.getId(before);
@@ -47,7 +33,8 @@ function limitFilter(filter, before, after, order, idName) {
 
 function applyPagination(filter, first, last, count) {
   if (first || last) {
-    let limit, skip;
+    let limit;
+    let skip;
 
     if (first && count > first) {
       limit = first;
@@ -76,3 +63,17 @@ function applyPagination(filter, first, last, count) {
     hasPreviousPage: Boolean(last && count > last),
   };
 }
+
+module.exports = function buildFilter(model, args) {
+  const idName = (model.getIdName && model.getIdName()) ? model.getIdName() : 'id';
+
+  const filter = {
+    where: args.where || {},
+  };
+
+  sortFilter(filter, args.order, args.before, idName);
+  limitFilter(filter, args.before, args.after, null, idName);
+  applyPagination(filter, args.first, args.last, args.count);
+
+  return filter;
+};

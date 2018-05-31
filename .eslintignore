@@ -3,3 +3,5 @@
 /out/**
 package-lock.json
 /test/
+/common/
+/server/

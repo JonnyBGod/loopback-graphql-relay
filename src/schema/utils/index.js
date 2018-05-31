@@ -1,10 +1,9 @@
-'use strict';
 
 const _ = require('lodash');
-const {connectionArgs} = require('graphql-relay');
+const { connectionArgs } = require('graphql-relay');
 
-const {getType, getConnection} = require('../../types/type');
-const {SCALARS} = require('../../types/generateTypeDefs');
+const { getType, getConnection } = require('../../types/type');
+const { SCALARS } = require('../../types/generateTypeDefs');
 
 const exchangeTypes = {
   any: 'JSON',
@@ -30,7 +29,7 @@ function isRemoteMethodAllowed(method, allowedVerbs) {
   }
 
   const results = httpArray.map((item) => {
-    const verb = item.verb;
+    const { verb } = item;
 
     if (allowedVerbs && !_.includes(allowedVerbs, verb)) {
       return false;
@@ -84,7 +83,7 @@ function getRemoteMethodOutput(method) {
     } else {
       returnType = `${method.returns[0].type}`;
       if (_.isArray(method.returns[0].type) && _.isString(method.returns[0].type[0])) {
-        returnType = method.returns[0].type[0];
+        returnType = method.returns[0].type[0];// eslint-disable-line
         list = true;
       } else if (typeof method.returns[0].type === 'object') {
         returnType = 'JSON';

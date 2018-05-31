@@ -1,8 +1,7 @@
-'use strict';
 
 const _ = require('lodash');
-const {GraphQLObjectType} = require('graphql');
-const {getType} = require('../types/type');
+const { GraphQLObjectType } = require('graphql');
+const { getType } = require('../types/type');
 const subWithPayload = require('../subscriptions/subscriptionWithPayload');
 
 function addModel(model) {
@@ -27,7 +26,7 @@ function addModel(model) {
   return fields;
 }
 
-module.exports = function(models) {
+module.exports = function (models) {
   const fields = {};
   _.forEach(models, (model) => {
     if (!model.shared) {

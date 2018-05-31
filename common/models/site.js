@@ -2,14 +2,15 @@
 
 module.exports = function(Site) {
 
-/*
   Site.sites = function(httpRequest, httpResponse, cb) {
 
-    var Account = Site.app.models.Account;
+    const Account = Site.app.models.Account;
 
-    const userId =   httpRequest.accessToken.userId.toString();
+    const userId = (typeof httpRequest.accessToken.userId === 'object')
+      ? httpRequest.accessToken.userId.toString()
+      : httpRequest.accessToken.userId;
 
-    Account.findById(userId, {include: 'sites'}, function(error, data) {
+    Account.findById(userId, { include: 'sites' }, (error, data) => {
 
       return cb(null, data.__data.sites);
 
@@ -19,11 +20,10 @@ module.exports = function(Site) {
 
   Site.remoteMethod('sites', {
     accepts: [
-      {arg: 'req', type: 'object', 'http': {source: 'req'}},
-      {arg: 'res', type: 'object', 'http': {source: 'res'}}
+      { arg: 'req', type: 'object', http: { source: 'req' } },
+      { arg: 'res', type: 'object', http: { source: 'res' } }
     ],
-    returns: {arg: '', type: "array", root:true},
-    http: {path: '/', verb: 'get'}
+    returns: { arg: '', type: 'array', root: true },
+    http: { path: '/sites', verb: 'get' }
   });
-*/
 };

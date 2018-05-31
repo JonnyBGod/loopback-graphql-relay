@@ -1,7 +1,6 @@
 /**
  * @deprecated since version 0.10.1
  */
-'use strict';
 
 // const PubSub = require('graphql-subscriptions').PubSub;
 const _ = require('lodash');
@@ -15,7 +14,7 @@ class PubSub {
     this.onUpdateMessage = this.onUpdateMessage.bind(this);
   }
 
-  publish(triggerName, payload) { // eslint-disable-line class-methods-use-this
+  publish() { // eslint-disable-line class-methods-use-this
     return true;
   }
 
@@ -26,13 +25,15 @@ class PubSub {
     const subId = this.getSubscriptionId(options.clientSubscriptionId || _.random(1, 99999));
 
     // Check Type
-    const {model} = options;
+    const { model } = options;
 
     if (_.isNil(model)) {
       return Promise.reject(new Error('No related model found for this subscription'));
     }
 
-    const {create, update, remove: rmv, options: opts} = options;
+    const {
+      create, update, remove: rmv, options: opts,
+    } = options;
 
     // Login
     // return Promise.resolve().then(() => new Promise((resolve, reject) => {
@@ -117,7 +118,7 @@ class PubSub {
       const payload = {
         subscriptionId: subId,
         event,
-        object: {data: obj},
+        object: { data: obj },
       };
 
       try {

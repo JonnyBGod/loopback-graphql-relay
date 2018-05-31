@@ -1,9 +1,8 @@
-'use strict';
 
 const _ = require('lodash');
-const {LoopbackPubSub} = require('graphql-loopback-subscriptions');
-const {withFilter} = require('graphql-subscriptions');
-const {getType} = require('../types/type');
+const { LoopbackPubSub } = require('graphql-loopback-subscriptions');
+const { withFilter } = require('graphql-subscriptions');
+const { getType } = require('../types/type');
 
 const {
   GraphQLInputObjectType,
@@ -22,16 +21,15 @@ function defaultGetPayload(obj) {
 }
 
 module.exports = function
-  subscriptionWithPayload(
-    {modelName, subscribeAndGetPayload = defaultGetPayload, model}) {
+  subscriptionWithPayload({ modelName, subscribeAndGetPayload = defaultGetPayload, model }) {
   const inputType = new GraphQLInputObjectType({
     name: `${modelName}SubscriptionInput`,
     fields: () => Object.assign(
-      {options: {type: getType('JSON')}},
-      {create: {type: getType('Boolean')}},
-      {update: {type: getType('Boolean')}},
-      {remove: {type: getType('Boolean')}},
-      {clientSubscriptionId: {type: getType('Int')}}
+      { options: { type: getType('JSON') } },
+      { create: { type: getType('Boolean') } },
+      { update: { type: getType('Boolean') } },
+      { remove: { type: getType('Boolean') } },
+      { clientSubscriptionId: { type: getType('Int') } },
     ),
   });
 
@@ -48,25 +46,25 @@ module.exports = function
     fields: () => Object.assign(
       {},
       resolveMaybeThunk(outputFields),
-      {where: {type: getType('JSON')}},
-      {type: {type: getType('String')}},
-      {target: {type: getType('String')}},
-      {clientSubscriptionId: {type: getType('Int')}}
+      { where: { type: getType('JSON') } },
+      { type: { type: getType('String') } },
+      { target: { type: getType('String') } },
+      { clientSubscriptionId: { type: getType('Int') } },
     ),
   });
 
   return {
     type: outputType,
     args: {
-      input: {type: new GraphQLNonNull(inputType)},
+      input: { type: new GraphQLNonNull(inputType) },
     },
     resolve(payload, args, context, info) {
       const clientSubscriptionId = (payload) ? payload.subscriptionId : null;
 
       const object = (payload) ? payload.object : null;
-      var where = null;
-      var type = null;
-      var target = null;
+      let where = null;
+      let type = null;
+      let target = null;
       if (object) {
         where = (payload) ? payload.object.where : null;
         type = (payload) ? payload.object.type : null;
@@ -74,8 +72,8 @@ module.exports = function
       }
 
       return Promise.resolve(subscribeAndGetPayload(payload, args, context, info))
-        .then(payload => ({
-          clientSubscriptionId, where, type, target, object: payload.data,
+        .then(resPayload => ({
+          clientSubscriptionId, where, type, target, object: resPayload.data,
         }));
     },
     subscribe: withFilter(
@@ -97,7 +95,7 @@ module.exports = function
           console.log(ex);
         }
         return true;
-      }
+      },
     ),
   };
 };
