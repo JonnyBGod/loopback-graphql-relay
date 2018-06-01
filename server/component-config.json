@@ -12,7 +12,6 @@
     },
     "subscriptionServer": {
       "disable": false,
-      "port": 5000,
       "options": {},
       "socketOptions": {}
     }
