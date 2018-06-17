@@ -1,6 +1,6 @@
 
 const _ = require('lodash');
-const { LoopbackPubSub } = require('graphql-loopback-subscriptions');
+const { PubSub } = require('graphql-loopback-subscriptions');
 const { withFilter } = require('graphql-subscriptions');
 const { getType } = require('../types/type');
 
@@ -10,7 +10,7 @@ const {
   GraphQLObjectType,
 } = require('graphql');
 
-const loopbackPubSub = new LoopbackPubSub();
+const loopbackPubSub = new PubSub();
 
 function resolveMaybeThunk(maybeThunk) {
   return typeof maybeThunk === 'function' ? maybeThunk() : maybeThunk;

@@ -1,20 +1,18 @@
 
-const { createServer } = require('http');
 const { SubscriptionServer } = require('subscriptions-transport-ws');
 const { execute, subscribe } = require('graphql');
 const bodyParser = require('body-parser');
 const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
 
 module.exports = function index(app, schema, opts) {
-  const PORT = 3000;
   const url = app.get('url') ? app.get('url').replace(/\/$/, '').replace('http', 'ws') : `ws://${app.get('host')}:${app.get('port')}`;
 
-  app.use('/graphiql', graphiqlExpress({
-    endpointURL: '/graphql',
+  app.use(opts.graphiqlPath || '/graphiql', graphiqlExpress({
+    endpointURL: opts.path || '/graphql',
     subscriptionsEndpoint: `${url}/subscriptions`,
   }));
 
-  app.use('/graphql', bodyParser.json(), graphqlExpress(req => ({
+  app.use(opts.path || '/graphql', bodyParser.json(), graphqlExpress(req => ({
     schema,
     rootValue: global,
     graphiql: false,
@@ -22,17 +20,9 @@ module.exports = function index(app, schema, opts) {
       app,
       req,
     },
+    tracing: !!(opts.apollo && opts.apollo.apiKey),
+    cacheControl: !!(opts.apollo && opts.apollo.apiKey),
   })));
-
-  const server = createServer(app);
-  server.listen(PORT, () => {
-    SubscriptionServer.create(
-      { execute, subscribe, schema },
-      { server, path: '/subscriptions' },
-    );
-    // eslint-disable-next-line no-console
-    console.log(`GraphQL server running on port ${PORT}.`);
-  });
 
   const subscriptionOpts = opts.subscriptionServer || {};
 
@@ -65,5 +55,5 @@ module.exports = function index(app, schema, opts) {
     }, { server: lbServer, path: opts.path || '/graphql' });
   });
 
-  return server;
+  return app;
 };
