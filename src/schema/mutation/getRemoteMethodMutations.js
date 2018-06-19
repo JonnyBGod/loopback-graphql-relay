@@ -55,6 +55,11 @@ module.exports = function getRemoteMethodMutations(model) {
               return connectionFromPromisedArray(wrap.apply(model, params), args, model);
             }
 
+            // HACK to support mutation for loopback methods that do not return anything
+            if (!method.returns || !method.returns.length) {
+              return wrap.apply(model, params).then(response => (response || {}));
+            }
+
             return wrap.apply(model, params);
           },
         });
