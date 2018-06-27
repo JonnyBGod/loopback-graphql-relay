@@ -37,7 +37,6 @@ module.exports = function
   const modelFieldName = _.camelCase(_.lowerCase(modelName));
   outputFields[modelFieldName] = {
     type: getType(modelName),
-    // resolve: o => o.object,
     resolve: o => o.object,
   };
 
