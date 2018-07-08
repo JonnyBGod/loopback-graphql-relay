@@ -1,7 +1,6 @@
-'use strict';
 
 const applyFilter = require('loopback-filters');
-const PassThrough = require('stream').PassThrough;
+const { PassThrough } = require('stream');
 
 /**
  * Default Model.createChangeStream doesn't respect the where clause.
@@ -9,8 +8,8 @@ const PassThrough = require('stream').PassThrough;
  *
  * More Info here: https://github.com/strongloop/angular-live-set/issues/11
  */
-module.exports = function(PatchModel) {
-  PatchModel.createChangeStream = function(options, cb) {
+module.exports = function (PatchModel) {
+  PatchModel.createChangeStream = function (options, cb) {
     /* Based on persisted-model#createChangeStream
      *
      * currentUser is being populated in server.js using tips from here:
@@ -25,10 +24,10 @@ module.exports = function(PatchModel) {
     const idName = this.getIdName();
     const Model = this;
 
-    let changes = new PassThrough({objectMode: true});
+    let changes = new PassThrough({ objectMode: true });
     let writeable = true;
 
-    changes.destroy = function() {
+    changes.destroy = function () {
       changes.removeAllListeners('error');
       changes.removeAllListeners('end');
       writeable = false;
@@ -46,20 +45,17 @@ module.exports = function(PatchModel) {
       cb(null, changes);
     });
 
-    Model.observe('after save', createChangeHandler('save', options));
-    Model.observe('after delete', createChangeHandler('delete', options));
-
-    function createChangeHandler(type, options) {
-      return function(ctx, next) {
+    function createChangeHandler(type, option) {
+      return function (ctx, next) { // eslint-disable-line
         // since it might have set to null via destroy
         if (!changes) {
           return next();
         }
 
-        const where = ctx.where;
+        const { where } = ctx;
         const data = ctx.instance || ctx.data;
 
-        const filtered = applyFilter([data], options);
+        const filtered = applyFilter([data], option);
 
         if (filtered.length < 1) {
           return next();
@@ -110,5 +106,8 @@ module.exports = function(PatchModel) {
         next();
       };
     }
+
+    Model.observe('after save', createChangeHandler('save', options));
+    Model.observe('after delete', createChangeHandler('delete', options));
   };
 };

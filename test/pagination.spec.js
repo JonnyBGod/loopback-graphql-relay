@@ -17,6 +17,34 @@ const gql = require('graphql-tag');
 
 describe('Pagination', () => {
 
+  before(() => Promise.fromCallback(cb => cpx.copy('./data.json', './data/', cb)));
+  let accessToken;
+  before(() => {
+    accessToken = 'ZDRBGfgwCVrtgxHERTiSH6B9jrZ30Uv1Dq3dzeRNxaFEmrVimQTPZ3fsHFEsLdv5';
+    // login
+    const query = gql `
+      mutation login {
+        Account {
+          AccountLogin(input:{
+            credentials: {
+              username: "mithoog", 
+              password: "abc"
+            }
+          }) {
+            obj
+          }
+        }
+      }`;
+    return chai.request(server)
+    .post('/graphql')
+    .send({
+      query
+    })
+    .then((res) => {
+      accessToken = res.body.data.Account.AccountLogin.obj.id;
+    });
+  });
+
   it('should query first 2 entities', () => {
     const query = gql `{
       viewer {
@@ -40,15 +68,15 @@ describe('Pagination', () => {
     }`;
     return chai.request(server)
       .post('/graphql')
-      .set('Authorization', 'jHLCT0e7rup6pPXOtzC9TvM0ov68DnmfwrGqJcKykg929gjC63I281GfZwqlRzVh')
+      .set('Authorization', accessToken)
       .send({
-        query,
+        query
       })
       .then((res) => {
         expect(res).to.have.status(200);
-        expect(res.body.data.viewer.sites).not.to.equal(null);
-        expect(res.body.data.viewer.sites.edges.length).to.equal(2);
-        expect(res.body.data.viewer.sites.totalCount).to.equal(3);
+        res = res.body.data;
+        expect(res.viewer.sites.edges.length).to.equal(2);
+        expect(res.viewer.sites.totalCount).to.equal(2);
       });
   });
 
@@ -75,16 +103,16 @@ describe('Pagination', () => {
     }`;
     return chai.request(server)
       .post('/graphql')
-      .set('Authorization', 'jHLCT0e7rup6pPXOtzC9TvM0ov68DnmfwrGqJcKykg929gjC63I281GfZwqlRzVh')
+      .set('Authorization', accessToken)
       .send({
-        query,
+        query
       })
       .then((res) => {
         expect(res).to.have.status(200);
         res = res.body.data;
-        expect(res.viewer.sites.totalCount).to.equal(3);
+        expect(res.viewer.sites.totalCount).to.equal(2);
         expect(res.viewer.sites.edges.length).to.be.above(0);
-        expect(fromGlobalId(res.viewer.sites.edges[0].node.id).id).to.equal('2');
+        expect(fromGlobalId(res.viewer.sites.edges[0].node.id).id).to.equal('6');
         expect(res.viewer.sites.pageInfo.hasNextPage).to.be.true;
       });
   });
@@ -119,15 +147,16 @@ describe('Pagination', () => {
 		}`;
     return chai.request(server)
       .post('/graphql')
-      .set('Authorization', 'jHLCT0e7rup6pPXOtzC9TvM0ov68DnmfwrGqJcKykg929gjC63I281GfZwqlRzVh')
+      .set('Authorization', accessToken)
       .send({
-        query,
+        query
       })
       .then((res) => {
         expect(res).to.have.status(200);
         res = res.body.data;
-        expect(res.viewer.sites.edges[0].node.name).to.equal('Site B of owner 5');
-        expect(res.viewer.sites.edges[0].node.books.totalCount).to.be.above(0);
+        expect(res.viewer.sites.edges[0].node.name).to.equal('BlueEastHq');
+        expect(res.viewer.sites.edges[0].node.books.edges.length).to.be.equal(0);
+        expect(res.viewer.sites.edges[0].node.books.totalCount).to.be.equal(0);
         expect(res.viewer.sites.edges[0].cursor).not.to.be.empty;
       });
   });

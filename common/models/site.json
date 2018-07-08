@@ -49,6 +49,20 @@
     {
       "accessType": "*",
       "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "findById"
+    },
+    {
+      "accessType": "*",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "DENY",
+      "property": "findById"
+    },
+    {
+      "accessType": "*",
+      "principalType": "ROLE",
       "principalId": "$authenticated",
       "permission": "ALLOW"
     },

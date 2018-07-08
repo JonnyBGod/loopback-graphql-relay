@@ -96,8 +96,6 @@ describe('Mutations', () => {
         expect(res).to.have.status(200);
         const result = res.body.data;
         expect(result.Note.NoteCreate.obj.content.body).to.equal(body);
-        expect(result.Note.NoteCreate.obj.author.firstName).to.equal('Virginia');
-        expect(result.Note.NoteCreate.obj.author.lastName).to.equal('Wolf');
       });
   });
 
@@ -137,7 +135,7 @@ describe('Mutations', () => {
         }
       }`;
     const variables = {
-      input: {credentials: {username: 'aatif', password: '123'}},
+      input: {credentials: {username: 'mithoog', password: 'abc'}},
     };
 
     return chai.request(server)

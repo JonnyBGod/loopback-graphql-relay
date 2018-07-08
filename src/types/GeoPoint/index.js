@@ -1,4 +1,3 @@
-'use strict';
 
 const loopback = require('loopback');
 
@@ -42,7 +41,7 @@ module.exports = {
               },
             },
           },
-          resolve: (obj, {point, options}) => {
+          resolve: (obj, { point, options }) => {
             const here = new loopback.GeoPoint(obj);
             const there = new loopback.GeoPoint(point);
 

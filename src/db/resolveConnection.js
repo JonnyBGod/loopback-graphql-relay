@@ -1,11 +1,6 @@
-'use strict';
 
 const _ = require('lodash');
 const utils = require('./utils');
-
-function connectionFromPromisedArray(dataPromise, args, model) {
-  return dataPromise.then(data => connectionFromArray(data, args));
-}
 
 function connectionFromArray(obj, args, model) {
   const idName = (model && model.getIdName()) ? model.getIdName() : 'id';
@@ -38,6 +33,10 @@ function connectionFromArray(obj, args, model) {
   }
 
   return res;
+}
+
+function connectionFromPromisedArray(dataPromise, args) {
+  return dataPromise.then(data => connectionFromArray(data, args));
 }
 
 module.exports = {

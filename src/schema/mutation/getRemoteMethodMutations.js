@@ -1,4 +1,3 @@
-'use strict';
 
 const _ = require('lodash');
 
@@ -7,7 +6,7 @@ const {
 } = require('graphql-relay');
 
 const promisify = require('promisify-node');
-const {connectionFromPromisedArray} = require('graphql-relay');
+const { connectionFromPromisedArray } = require('graphql-relay');
 
 const utils = require('../utils');
 // const { getType } = require('../../types/type');
@@ -36,7 +35,7 @@ module.exports = function getRemoteMethodMutations(model) {
         hooks[hookName] = mutationWithClientMutationId({
           name: hookName,
           description: method.description,
-          meta: {relation: true},
+          meta: { relation: true },
           inputFields: acceptingParams,
           outputFields: {
             obj: {

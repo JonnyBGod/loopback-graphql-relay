@@ -1,11 +1,10 @@
-'use strict';
 
 const _ = require('lodash');
 const waterfall = require('async/waterfall');
 
 const buildFilter = require('./buildFilter');
 
-function getCount(model, obj, args, context) {
+function getCount(model, obj, args) {
   return model.count(args.where);
 }
 
@@ -19,7 +18,7 @@ function getFirst(model, obj, args) {
     .then(res => (res || {}));
 }
 
-function findOne(model, obj, args, context) {
+function findOne(model, obj, args) {
   const id = obj ? obj[model.getIdName()] : args.id;
   return (id) ? model.findById(id) : null;
 }
@@ -28,7 +27,7 @@ function getList(model, obj, args) {
   return model.find(buildFilter(model, args));
 }
 
-function findAll(model, obj, args, context) {
+function findAll(model, obj, args) {
   const response = {
     args,
     count: undefined,
@@ -42,7 +41,7 @@ function findAll(model, obj, args, context) {
     })
     .then((first) => {
       response.first = first;
-      return getList(model, obj, Object.assign({}, args, {count: response.count}));
+      return getList(model, obj, Object.assign({}, args, { count: response.count }));
     })
     .then((list) => {
       response.list = list;
@@ -50,7 +49,7 @@ function findAll(model, obj, args, context) {
     });
 }
 
-function findAllRelated(model, obj, method, args, context) {
+function findAllRelated(model, obj, method, args) {
   const response = {
     args,
     count: undefined,
@@ -60,10 +59,10 @@ function findAllRelated(model, obj, method, args, context) {
 
   return new Promise((resolve, reject) => {
     waterfall([
-      function(callback) {
+      function (callback) {
         obj[`__count__${method}`](args.where, callback);
       },
-      function(count, callback) {
+      function (count, callback) {
         response.count = count;
 
         const idName = (model.getIdName && model.getIdName()) ? model.getIdName() : 'id';
@@ -72,9 +71,9 @@ function findAllRelated(model, obj, method, args, context) {
           where: args.where,
         }, callback);
       },
-      function(first, callback) {
+      function (first, callback) {
         response.first = first;
-        obj[`__get__${method}`](buildFilter(model, Object.assign({}, args, {count: response.count})), callback);
+        obj[`__get__${method}`](buildFilter(model, Object.assign({}, args, { count: response.count })), callback);
       },
     ], (err, list) => {
       if (err) {
@@ -86,7 +85,7 @@ function findAllRelated(model, obj, method, args, context) {
   });
 }
 
-function findAllViaThrough(rel, obj, args, context) {
+function findAllViaThrough(rel, obj, args) {
   const response = {
     args,
     count: undefined,
@@ -96,10 +95,10 @@ function findAllViaThrough(rel, obj, args, context) {
 
   return new Promise((resolve, reject) => {
     waterfall([
-      function(callback) {
+      function (callback) {
         obj[`__count__${rel.name}`](args.where, callback);
       },
-      function(count, callback) {
+      function (count, callback) {
         response.count = count;
 
         const idName = (rel.modelTo.getIdName && rel.modelTo.getIdName()) ? rel.modelTo.getIdName() : 'id';
@@ -108,9 +107,9 @@ function findAllViaThrough(rel, obj, args, context) {
           where: args.where,
         }, callback);
       },
-      function(first, callback) {
+      function (first, callback) {
         response.first = first;
-        obj[`__get__${rel.name}`](buildFilter(rel.modelTo, Object.assign({}, args, {count: response.count})), callback);
+        obj[`__get__${rel.name}`](buildFilter(rel.modelTo, Object.assign({}, args, { count: response.count })), callback);
       },
     ], (err, list) => {
       if (err) {

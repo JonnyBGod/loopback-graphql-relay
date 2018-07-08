@@ -1,8 +1,5 @@
-'use strict';
 
-const GraphQLObjectType = require('graphql').GraphQLObjectType;
-const GraphQLFloat = require('graphql').GraphQLFloat;
-const GraphQLNonNull = require('graphql').GraphQLNonNull;
+const { GraphQLObjectType, GraphQLFloat, GraphQLNonNull } = require('graphql');
 
 const Type = new GraphQLObjectType({
   name: 'GeoPoint',

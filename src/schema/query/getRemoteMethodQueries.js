@@ -1,10 +1,10 @@
-'use strict';
 
 const _ = require('lodash');
 
 const promisify = require('promisify-node');
 const utils = require('../utils');
-const {connectionFromPromisedArray} = require('graphql-relay');
+const { connectionFromPromisedArray } = require('graphql-relay');
+
 const allowedVerbs = ['get', 'head'];
 const defaultFindMethods = ['find'];
 
@@ -31,10 +31,10 @@ module.exports = function getRemoteMethodQueries(model) {
         hooks[hookName] = {
           name: hookName,
           description: method.description,
-          meta: {relation: true},
+          meta: { relation: true },
           args: acceptingParams,
           type: typeObj.type,
-          resolve: (__, args, context, info) => {
+          resolve: (__, args) => {
             let params = [];
 
             _.forEach(acceptingParams, (param, name) => {
@@ -44,9 +44,9 @@ module.exports = function getRemoteMethodQueries(model) {
             const wrap = promisify(model[method.name]);
 
             if (typeObj.list) {
-              if (defaultFindMethods.indexOf(method.name) == -1 && method.returns[0].type.indexOf('any') != -1) {
+              if (defaultFindMethods.indexOf(method.name) === -1 && method.returns[0].type.indexOf('any') !== -1) {
                 params = [];
-                _.forEach(method.accepts, (accept, index) => {
+                _.forEach(method.accepts, (accept) => {
                   params.push(args[accept.arg]);
                 });
               }

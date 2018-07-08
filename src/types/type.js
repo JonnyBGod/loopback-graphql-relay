@@ -1,4 +1,3 @@
-'use strict';
 
 const _ = require('lodash');
 
@@ -10,13 +9,13 @@ const {
   GraphQLInt,
 } = require('graphql');
 
-const {connectionDefinitions} = require('graphql-relay');
+const { connectionDefinitions } = require('graphql-relay');
 
 const CustomGraphQLDateType = require('./Date');
 const GraphQLJSON = require('graphql-type-json');
 
-const {getTypeDef} = require('./generateTypeDefs');
-const {init, generateType, getNodeDefinitions} = require('./generateType');
+const { getTypeDef } = require('./generateTypeDefs');
+const { init, generateType, getNodeDefinitions } = require('./generateType');
 
 /**
  * Singleton Placeholders
@@ -60,27 +59,6 @@ const getScalar = (name) => {
 };
 
 /**
- * Get or create connection object
- * @param {*} name
- */
-const getConnection = (name) => {
-  if (!connectionTypes[name]) {
-    connectionTypes[name] = connectionDefinitions({
-      name,
-      nodeType: getType(name),
-      connectionFields: {
-        totalCount: {
-          type: GraphQLInt,
-          description: 'Total number of items',
-          resolve: connection => connection.totalCount,
-        },
-      },
-    }).connectionType;
-  }
-  return connectionTypes[name];
-};
-
-/**
  * Get a type by name
  * @param {*} name
  */
@@ -108,10 +86,31 @@ const getType = (name) => {
   }
 };
 
+/**
+ * Get or create connection object
+ * @param {*} name
+ */
+const getConnection = (name) => {
+  if (!connectionTypes[name]) {
+    connectionTypes[name] = connectionDefinitions({
+      name,
+      nodeType: getType(name),
+      connectionFields: {
+        totalCount: {
+          type: GraphQLInt,
+          description: 'Total number of items',
+          resolve: connection => connection.totalCount,
+        },
+      },
+    }).connectionType;
+  }
+  return connectionTypes[name];
+};
+
 function buildTypes(models) {
   init(models);
 
-  _.forEach(models, (model) =>  {
+  _.forEach(models, (model) => {
     getType(model.modelName);
   });
 
