@@ -1,43 +1,13 @@
 
 const _ = require('lodash');
-const { ApolloEngine } = require('apollo-engine');
+const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
 const { getSchema } = require('./schema/index');
+const bodyParser = require('body-parser');
+
 const startSubscriptionServer = require('./subscriptions');
 const patchChangeStream = require('./subscriptions/patchChangeStream');
 
 module.exports = function index(app, options) {
-  const { apollo } = options;
-
-  if (apollo) {
-    if (!apollo.apiKey) {
-      throw new Error('Apollo engine api key is not defined');
-    }
-    const engine = new ApolloEngine({
-      apiKey: apollo.apiKey,
-      logging: {
-        level: apollo.debugLevel || 'DEBUG',
-        // DEBUG, INFO, WARN or ERROR
-      },
-    });
-
-    app.on('started', () => {
-      engine.listen({
-        port: app.get('port'),
-        expressApp: app,
-        // GraphQL endpoint suffix - '/graphql' by default
-        graphqlPaths: [options.path || '/graphql'],
-        frontends: [{
-          overrideGraphqlResponseHeaders: {
-            'Access-Control-Allow-Origin': '*',
-          },
-        }],
-        origins: [{
-          supportsBatch: true,
-        }],
-      });
-    });
-  }
-
   const models = app.models();
 
   _.forEach(models, (model) => {
@@ -45,6 +15,25 @@ module.exports = function index(app, options) {
   });
 
   const schema = getSchema(models, options);
+
+  const url = app.get('url') ? app.get('url').replace(/\/$/, '').replace('http', 'ws') : `ws://${app.get('host')}:${app.get('port')}`;
+
+  app.use(options.path || '/graphql', bodyParser.json(), graphqlExpress(req => ({
+    schema,
+    rootValue: global,
+    graphiql: false,
+    context: {
+      app,
+      req,
+    },
+    tracing: true,
+    cacheControl: true,
+  })));
+
+  app.use(options.graphiqlPath || '/graphiql', graphiqlExpress({
+    endpointURL: options.path || '/graphql',
+    subscriptionsEndpoint: `${url}/subscriptions`,
+  }));
 
   try {
     startSubscriptionServer(app, schema, options);
