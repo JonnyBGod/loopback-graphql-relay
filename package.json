@@ -1,8 +1,8 @@
 {
   "name": "loopback-graphql-relay",
   "description": "Add Relay based Apollo Server or GraphQL queries on your Loopback server",
-  "version": "3.0.0",
-  "main": "src/boot.js",
+  "version": "2.0.0-beta.2",
+  "main": "src/index.js",
   "directories": {
     "test": "test"
   },

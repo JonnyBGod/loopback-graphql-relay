@@ -23,8 +23,8 @@ module.exports = function (app, options) {
   app.use(path, bodyParser.json(), graphqlExpress(req => ({
     schema,
     context: { app, req },
-    tracing: true,
-    cacheControl: true,
+    tracing: false,
+    cacheControl: false,
   })));
 
 
