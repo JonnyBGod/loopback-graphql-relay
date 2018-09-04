@@ -17,9 +17,16 @@ function sortFilter(filter, order, before, idName) {
   }
 }
 
-function limitFilter(filter, before, after, order, idName) {
-  const begin = utils.getId(after);
-  const end = utils.getId(before);
+function limitFilter(model, filter, before, after, order, idName) {
+  let begin = after;
+  let end = before;
+
+  if (model.definition.settings['loopback-graphql-relay'] && model.definition.settings['loopback-graphql-relay'].idField) {
+    idName = model.definition.settings['loopback-graphql-relay'].idField;
+  } else {
+    begin = utils.getId(after);
+    end = utils.getId(before);
+  }
 
   if (begin) {
     filter.where[idName] = filter[idName] || {};
@@ -72,7 +79,7 @@ module.exports = function buildFilter(model, args) {
   };
 
   sortFilter(filter, args.order, args.before, idName);
-  limitFilter(filter, args.before, args.after, null, idName);
+  limitFilter(model, filter, args.before, args.after, null, idName);
   applyPagination(filter, args.first, args.last, args.count);
 
   return filter;

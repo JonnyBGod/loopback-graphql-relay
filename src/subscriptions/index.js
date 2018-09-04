@@ -6,11 +6,13 @@ const { execute, subscribe } = require('graphql');
 module.exports = function index(app, schema, opts) {
   const subscriptionOpts = opts.subscriptionServer || {};
 
-  const disable = subscriptionOpts.disable || false;
+  app.use('/graphql', bodyParser.json(), graphqlExpress({
+    schema,
+  }));
 
-  if (disable === true) {
-    return undefined;
-  }
+  if (!subscriptionOpts.graphiqlHost) subscriptionOpts.graphiqlHost = 'localhost';
+  if (subscriptionOpts.ssl) subscriptionOpts.wsEndpointURL = `wss://${subscriptionOpts.graphiqlHost}:${WS_PORT}/subscriptions`;
+  else subscriptionOpts.wsEndpointURL = `ws://${subscriptionOpts.graphiqlHost}:${WS_PORT}/subscriptions`;
 
   const validateToken = authToken => new Promise((resolve, reject) => {
     let accessToken = '';

@@ -1,8 +1,8 @@
 {
   "name": "@jmnribeiro/loopback-graphql-relay",
   "description": "Add Relay based Apollo Server or GraphQL queries on your Loopback server",
-  "version": "1.0.6",
-  "main": "src/boot.js",
+  "version": "2.0.0-beta.4",
+  "main": "src/index.js",
   "directories": {
     "test": "test"
   },
@@ -35,25 +35,27 @@
     "REST",
     "APIs"
   ],
-  "author": "Abdul Rehman Talat <rehman.talat@gmail.com>",
+  "author": "Abdul Rehman Talat <rehman.talat@gmail.com>, Abdul Ghaffar <gmithoog@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/BlueEastCode/loopback-graphql-relay/issues"
   },
   "homepage": "https://github.com/BlueEastCode/loopback-graphql-relay#readme",
   "dependencies": {
-    "apollo-cache-inmemory": "^1.2.5",
+    "@blueeast/graphql-mqtt-subscriptions": "2.1.7",
+    "apollo-cache-inmemory": "^1.1.4",
+    "apollo-engine": "0.8.10",
     "apollo-link-http": "^1.3.2",
-    "apollo-server-express": "^1.3.2",
-    "async": "^2.6.1",
-    "body-parser": "^1.18.3",
+    "apollo-server-express": "^1.3.6",
+    "async": "2.6.0",
+    "body-parser": "1.18.2",
     "chai-as-promised": "^7.1.1",
     "event-stream": "3.3.4",
     "express-graphql": "^0.6.11",
     "graphql": "^0.13.0",
     "graphql-date": "1.0.3",
-    "graphql-loopback-subscriptions": "^2.0.1",
-    "graphql-relay": "^0.5.5",
+    "graphql-loopback-subscriptions": "2.0.1",
+    "graphql-relay": "git+https://github.com/BlueEastCode/graphql-relay-js.git",
     "graphql-subscriptions": "^0.5.6",
     "graphql-type-json": "^0.2.1",
     "lodash": "^4.17.10",
