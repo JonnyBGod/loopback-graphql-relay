@@ -27,7 +27,7 @@ describe('Pagination', () => {
         Account {
           AccountLogin(input:{
             credentials: {
-              username: "mithoog", 
+              username: "mithoog",
               password: "abc"
             }
           }) {
@@ -58,7 +58,7 @@ describe('Pagination', () => {
           }
           edges {
             node {
-              id 
+              id
               name
             }
             cursor
@@ -77,6 +77,42 @@ describe('Pagination', () => {
         res = res.body.data;
         expect(res.viewer.sites.edges.length).to.equal(2);
         expect(res.viewer.sites.totalCount).to.equal(2);
+      });
+  });
+
+  it('should query entity after cursor', () => {
+    const query = gql `{
+      Site {
+        SiteFind(after: "YXJyYXljb25uZWN0aW9uOjQ=", first: 1) {
+          totalCount
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+            startCursor
+            endCursor
+          }
+          edges {
+            node {
+              id
+              name
+            }
+            cursor
+          }
+        }
+      }
+    }`;
+    return chai.request(server)
+      .post('/graphql')
+      .set('Authorization', accessToken)
+      .send({
+        query
+      })
+      .then((res) => {
+        expect(res).to.have.status(200);
+        res = res.body.data;
+        expect(res.Site.SiteFind.edges.length).to.be.above(0);
+        expect(fromGlobalId(res.Site.SiteFind.edges[0].node.id).id).to.equal('6');
+        expect(res.Site.SiteFind.pageInfo.hasNextPage).to.be.true;
       });
   });
 

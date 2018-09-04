@@ -44,7 +44,7 @@ module.exports = function getRemoteMethodQueries(model) {
             const wrap = promisify(model[method.name]);
 
             if (typeObj.list) {
-              if (defaultFindMethods.indexOf(method.name) === -1 && method.returns[0].type.indexOf('any') !== -1) {
+              if (defaultFindMethods.indexOf(method.name) !== -1 || method.returns[0].type.indexOf('any') !== -1) {
                 params = [];
                 _.forEach(method.accepts, (accept) => {
                   params.push(args[accept.arg]);

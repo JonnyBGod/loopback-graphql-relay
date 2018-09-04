@@ -43,11 +43,11 @@ const getScalar = (name) => {
     case 'Date':
       return CustomGraphQLDateType;
 
-    // case 'File':
-    //   return FileType;
+      // case 'File':
+      //   return FileType;
 
-    // case 'GeoPoint':
-    //   return GeoPointType;
+      // case 'GeoPoint':
+      //   return GeoPointType;
 
     case 'Json':
     case 'JSON':
