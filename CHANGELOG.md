@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.0.0"></a>
+# [2.0.0](https://github.com/BlueEastCode/loopback-graphql-relay/compare/v1.0.6...v2.0.0) (2018-09-04)
+
+
+### Bug Fixes
+
+* **schema:** query pagination ([bb87fd4](https://github.com/BlueEastCode/loopback-graphql-relay/commit/bb87fd4))
+* **subscriptionWithPayload.js:** Fix subscription ([9cfc42d](https://github.com/BlueEastCode/loopback-graphql-relay/commit/9cfc42d))
+
+
+
 <a name="1.0.6"></a>
 ## [1.0.6](https://github.com/BlueEastCode/loopback-graphql-relay/compare/v1.0.5...v1.0.6) (2018-07-11)
 
