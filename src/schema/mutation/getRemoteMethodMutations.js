@@ -43,7 +43,7 @@ module.exports = function getRemoteMethodMutations(model) {
               resolve: o => o,
             },
           },
-          mutateAndGetPayload: (args) => {
+          mutateAndGetPayload: async (args) => {
             const params = [];
 
             _.forEach(acceptingParams, (param, name) => {
@@ -57,10 +57,20 @@ module.exports = function getRemoteMethodMutations(model) {
 
             // HACK to support mutation for loopback methods that do not return anything
             if (!method.returns || !method.returns.length) {
-              return wrap.apply(model, params).then(response => (response || {}));
+              return await wrap.apply(model, params).then(response => (response || {}));
             }
 
-            return wrap.apply(model, params);
+            const result = await wrap.apply(model, params);
+
+            if (method.name === "create" || method.name === "update") {
+              const relationProms = []
+              for (const key in model.relations) {
+                const relation = model.relations[key]
+                relationProms.push(resolveRelation(result, params[0], model, relation))
+              }
+              await Promise.all(relationProms)
+            }
+            return result
           },
         });
       }
@@ -69,3 +79,38 @@ module.exports = function getRemoteMethodMutations(model) {
 
   return hooks;
 };
+
+async function resolveRelation (instance, values, model, relation) {
+  const relationValues = values[relation.name]
+  if (!relationValues) {
+    return
+  }
+  if (relation.type === "hasMany" && !relation.modelThrough) {
+    await resolveHasMany(instance, relationValues, model, relation)
+  } else if (relation.type === "hasMany" && relation.modelThrough) {
+    await resolveHasManyThrough(instance, relationValues, relation)
+  }
+}
+
+async function resolveHasMany (instance, values, model, relation) {
+  const relationModel = relation.modelTo
+  for (const value of values) {
+    const where = {
+      [relation.keyTo]: instance[model.definition.idName() || 'id']
+    }
+    if (value[relation.modelTo.definition.idName() || 'id']) {
+      where[relation.modelTo.definition.idName() || 'id'] = value[relation.modelTo.definition.idName() || 'id']
+    }
+    await relationModel.upsertWithWhere(where, value)
+  }
+}
+
+async function resolveHasManyThrough (instance, values, relation) {
+  for (const value of values) {
+    if (value[relation.modelTo.definition.idName() || 'id']) {
+      await instance['__link__' + relation.name](value.id)
+    } else {
+      await instance[relation.name].create(value)
+    }
+  }
+}
