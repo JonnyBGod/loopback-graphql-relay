@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.0.3"></a>
+## [2.0.3](https://github.com/BlueEastCode/loopback-graphql-relay/compare/v2.0.2...v2.0.3) (2018-10-11)
+
+
+### Bug Fixes
+
+* **core:** support referencesMany relations ([e89e36f](https://github.com/BlueEastCode/loopback-graphql-relay/commit/e89e36f))
+
+
+
 <a name="2.0.2"></a>
 ## [2.0.2](https://github.com/BlueEastCode/loopback-graphql-relay/compare/v2.0.1...v2.0.2) (2018-09-26)
 
