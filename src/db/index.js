@@ -122,17 +122,19 @@ function findAllViaThrough(rel, obj, args) {
 }
 
 function findRelatedMany(rel, obj, args, context) {
-  if (_.isArray(obj[rel.keyFrom])) {
-    return [];
-  }
-
   if (rel.modelThrough) {
     return findAllViaThrough(rel, obj, args, context);
   }
 
-  args.where = {
-    [rel.keyTo]: obj[rel.keyFrom],
-  };
+  if (_.isArray(obj[rel.keyFrom])) {
+    args.where = {
+      [rel.keyTo]: { inq: obj[rel.keyFrom] },
+    };
+  } else {
+    args.where = {
+      [rel.keyTo]: obj[rel.keyFrom],
+    };
+  }
 
   return findAll(rel.modelTo, obj, args, context);
 }
