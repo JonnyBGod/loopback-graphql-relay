@@ -22,6 +22,12 @@ const exchangeTypes = {
  * @param {*} allowedVerbs
  */
 function isRemoteMethodAllowed(method, allowedVerbs) {
+  if (!method.ctor.config.public) {
+    return false;
+  }
+  if (!method.shared) {
+    return false;
+  }
   let httpArray = method.http;
 
   if (!_.isArray(method.http)) {
