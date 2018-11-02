@@ -8,9 +8,6 @@ const chai = require('chai').use(require('chai-http'));
 const server = require('../server/server');
 const cpx = require('cpx');
 
-const gql = require('graphql-tag');
-// var _ = require('lodash');
-
 describe('Mutations', () => {
 
     var authorId = 123;
@@ -20,7 +17,7 @@ describe('Mutations', () => {
     });
 
   it('should add a single entity', () => {
-    const query = gql `
+    const query = `
       mutation save($data: JSON!) {
         Author {
           AuthorCreate(input: {data: $data}) {
@@ -57,7 +54,7 @@ describe('Mutations', () => {
 
   it('should add a single entity with sub type', () => {
     const body = 'Heckelbery Finn';
-    const query = gql `
+    const query = `
       mutation save($data: JSON!) {
         Note {
           NoteCreate(input: { data: $data }) {
@@ -100,7 +97,7 @@ describe('Mutations', () => {
   });
 
   it('should delete a single entity', () => {
-    const query = gql `
+    const query = `
       mutation delete($input: AuthorDeleteByIdInput!) {
         Author {
           AuthorDeleteById(input: $input) {
@@ -126,7 +123,7 @@ describe('Mutations', () => {
   });
 
   it('should login and return an accessToken', () => {
-    const query = gql `
+    const query = `
       mutation login ($input: AccountLoginInput!){
         Account {
           AccountLogin(input: $input) {
@@ -151,7 +148,7 @@ describe('Mutations', () => {
   });
 
   it('should not login and return an error', () => {
-    const query = gql `
+    const query = `
     mutation login ($input: AccountLoginInput!){
       Account {
         AccountLogin(input: $input) {

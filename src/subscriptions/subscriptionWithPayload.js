@@ -1,7 +1,7 @@
 
 const _ = require('lodash');
 const { MQTTPubSub } = require('@blueeast/graphql-mqtt-subscriptions');
-const { withFilter } = require('graphql-subscriptions');
+const { withFilter } = require('apollo-server-express');
 const { getType } = require('../types/type');
 
 const {
@@ -71,7 +71,7 @@ module.exports = function subscriptionWithPayload({ modelName, subscribeAndGetPa
 
       return Promise.resolve(subscribeAndGetPayload(payload, args, context, info)).then(resPayload => (
         {
-          clientSubscriptionId, where, type, target, object: resPayload.data,
+          clientSubscriptionId, where, type, target, object: resPayload ? resPayload.data : null,
         }
       ));
     },

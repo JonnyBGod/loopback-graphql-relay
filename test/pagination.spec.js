@@ -12,9 +12,6 @@ const cpx = require('cpx');
 
 const {fromGlobalId} = require('graphql-relay');
 
-const gql = require('graphql-tag');
-// var _ = require('lodash');
-
 describe('Pagination', () => {
 
   before(() => Promise.fromCallback(cb => cpx.copy('./data.json', './data/', cb)));
@@ -22,7 +19,7 @@ describe('Pagination', () => {
   before(() => {
     accessToken = 'ZDRBGfgwCVrtgxHERTiSH6B9jrZ30Uv1Dq3dzeRNxaFEmrVimQTPZ3fsHFEsLdv5';
     // login
-    const query = gql `
+    const query = `
       mutation login {
         Account {
           AccountLogin(input:{
@@ -46,7 +43,7 @@ describe('Pagination', () => {
   });
 
   it('should query first 2 entities', () => {
-    const query = gql `{
+    const query = `{
       viewer {
         sites(first: 2) {
           totalCount
@@ -81,7 +78,7 @@ describe('Pagination', () => {
   });
 
   it('should query entity after cursor', () => {
-    const query = gql `{
+    const query = `{
       Site {
         SiteFind(after: "YXJyYXljb25uZWN0aW9uOjQ=", first: 1) {
           totalCount
@@ -117,7 +114,7 @@ describe('Pagination', () => {
   });
 
   it('should query entity after cursor', () => {
-    const query = gql `{
+    const query = `{
       viewer {
         sites(after: "Y29ubmVjdGlvbi4x", first: 1) {
           totalCount
@@ -154,7 +151,7 @@ describe('Pagination', () => {
   });
 
   it('should query related entity on edge', () => {
-    const query = gql `{
+    const query = `{
 			viewer {
 				sites (after: "U2l0ZTox", first: 1) {
 					pageInfo {

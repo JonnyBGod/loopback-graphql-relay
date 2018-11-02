@@ -1,44 +1,81 @@
 
 const _ = require('lodash');
-const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
+const { ApolloServer } = require('apollo-server-express');
 const { getSchema } = require('./schema/index');
-const bodyParser = require('body-parser');
+const { execute, subscribe } = require('graphql');
+const http = require('http');
 
-const startSubscriptionServer = require('./subscriptions');
 const patchChangeStream = require('./subscriptions/patchChangeStream');
 
 module.exports = function index(app, options) {
   const models = app.models();
 
-  _.forEach(models, (model) => {
-    patchChangeStream(model);
-  });
+  if (!options.subscriptionServer) {
+    options.subscriptionServer = {};
+  }
+
+  if (options.subscriptionServer.disabled !== true) {
+    _.forEach(models, (model) => {
+      patchChangeStream(model);
+    });
+  }
 
   const schema = getSchema(models, options);
 
-  const url = app.get('url') ? app.get('url').replace(/\/$/, '').replace('http', 'ws') : `ws://${app.get('host')}:${app.get('port')}`;
+  const validateToken = authToken => new Promise((resolve, reject) => {
+    let accessToken = '';
+    if (options.subscriptionServer.AccessTokenModel) {
+      accessToken = app.models[options.subscriptionServer.AccessTokenModel];
+    } else {
+      accessToken = app.models.AccessToken;
+    }
 
-  app.use(options.path || '/graphql', bodyParser.json(), graphqlExpress(req => ({
+    accessToken.resolve(authToken, (err, token) => {
+      if (token) {
+        resolve();
+      } else reject(err);
+    });
+  });
+
+  function wsConnect(connectionParams) {
+    if (options.subscriptionServer.auth && connectionParams.authToken) {
+      return validateToken(connectionParams.authToken).then(() => true).catch(() => false);
+    } else if (!options.subscriptionServer.auth) return true;
+    return false;
+  }
+
+  app.apollo = new ApolloServer({
     schema,
-    rootValue: global,
-    graphiql: false,
-    context: {
-      app,
-      req,
-    },
+    context: ({ req, connection }) => ({ app, connection, req }),
     tracing: true,
-    cacheControl: true,
-  })));
+    cacheControl: { defaultMaxAge: 5 },
+    // persistedQueries: {
+    //   cache: new MemcachedCache(
+    //     ['memcached-server-1', 'memcached-server-2', 'memcached-server-3'],
+    //     { retries: 10, retry: 10000 }, // Options
+    //   ),
+    // },
+    engine: options.apiKey || app.get('apolloEngineKey') ? {
+      apiKey: options.apiKey || app.get('apolloEngineKey'),
+    } : false,
+    subscriptions: options.subscriptionServer.disabled !== true ? {
+      execute,
+      subscribe,
+      onConnect: wsConnect,
+      path: options.path || '/graphql',
+    } : false,
+  });
+  app.apollo.applyMiddleware({ app });
 
-  app.use(options.graphiqlPath || '/graphiql', graphiqlExpress({
-    endpointURL: options.path || '/graphql',
-    subscriptionsEndpoint: `${url}/subscriptions`,
-  }));
-
-  try {
-    startSubscriptionServer(app, schema, options);
-  } catch (ex) {
-    // eslint-disable-next-line no-console
-    console.error(ex);
+  if (options.subscriptionServer.disabled !== true) {
+    const subsServer = http.createServer(app);
+    app.apollo.installSubscriptionHandlers(subsServer);
+    app.listen = function listen(port, cb) {
+      if (typeof port === 'function' && typeof cb === 'undefined') {
+        cb = port;
+        port = app.get('port');
+      }
+      return subsServer.listen(port, cb);
+    };
   }
 };

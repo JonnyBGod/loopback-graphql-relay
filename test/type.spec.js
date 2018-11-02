@@ -4,7 +4,6 @@ const expect = require('chai').expect;
 const chai = require('chai')
   .use(require('chai-http'));
 const server = require('../server/server');
-const gql = require('graphql-tag');
 const Promise = require('bluebird');
 const cpx = require('cpx');
 
@@ -13,7 +12,7 @@ describe('Types', () => {
 
   describe('GeoPoint', () => {
     it('should contain a single object with location', () => {
-      const query = gql `
+      const query = `
         {
           Googlemaps {
             GooglemapsFindOne(filter:{where: {id: 1}}) {
@@ -39,7 +38,7 @@ describe('Types', () => {
     });
 
     it('should have location distance of 486 miles', () => {
-      const query = gql `
+      const query = `
         {
           Googlemaps {
             GooglemapsFindOne(filter:{where: {id: 1}}) {

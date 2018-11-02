@@ -4,7 +4,6 @@ const expect = require('chai').expect;
 const chai = require('chai')
 .use(require('chai-http'));
 const server = require('../server/server');
-const gql = require('graphql-tag');
 const Promise = require('bluebird');
 const cpx = require('cpx');
 
@@ -16,12 +15,12 @@ describe('Queries', () => {
     let accessToken;
     before(() => {
       // login
-      const query = gql `
+      const query = `
       mutation login {
         Account {
           AccountLogin(input:{
             credentials: {
-              username: "mithoog", 
+              username: "mithoog",
               password: "abc"
             }
           }) {
@@ -40,7 +39,7 @@ describe('Queries', () => {
     });
 
     it('should fetch sites of owner only', () => {
-      const query = gql `
+      const query = `
             query {
               viewer {
                 sites {

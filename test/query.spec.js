@@ -3,7 +3,6 @@
 const expect = require('chai').expect;
 const chai = require('chai').use(require('chai-http'));
 const server = require('../server/server');
-const gql = require('graphql-tag');
 const Promise = require('bluebird');
 const cpx = require('cpx');
 
@@ -14,12 +13,12 @@ describe('Queries', () => {
     before(() => {
       accessToken = 'ZDRBGfgwCVrtgxHERTiSH6B9jrZ30Uv1Dq3dzeRNxaFEmrVimQTPZ3fsHFEsLdv5';
       // login
-      const query = gql `
+      const query = `
       mutation login {
         Account {
           AccountLogin(input:{
             credentials: {
-              username: "amnaj", 
+              username: "amnaj",
               password: "123"
             }
           }) {
@@ -38,7 +37,7 @@ describe('Queries', () => {
     });
 
     it('should execute a single query with relation', () => {
-      const query = gql `
+      const query = `
             query {
               viewer {
                 sites(first: 1) {
@@ -69,7 +68,7 @@ describe('Queries', () => {
     });
 
     it('should have a total count of 3', () => {
-      const query = gql `
+      const query = `
       {
         viewer {
           sites {
@@ -90,7 +89,7 @@ describe('Queries', () => {
     });
 
     it('should sort sites by name in descending order', () => {
-      const query = gql `
+      const query = `
         {
           viewer {
             sites (order: "name DESC") {
@@ -118,7 +117,7 @@ describe('Queries', () => {
     });
 
     it('should return current logged in user', () => {
-      const query = gql `
+      const query = `
         {
           viewer {
             me { id username email }
@@ -140,7 +139,7 @@ describe('Queries', () => {
 
   describe('Remote hooks', () => {
     it('count', () => {
-      const query = gql `
+      const query = `
         {
           Author {
             count: AuthorCount
@@ -158,7 +157,7 @@ describe('Queries', () => {
     });
 
     it('exists', () => {
-      const query = gql `
+      const query = `
         {
           Author {
             exists: AuthorExists(id: 3)
@@ -176,7 +175,7 @@ describe('Queries', () => {
     });
 
     it('findOne', () => {
-      const query = gql `
+      const query = `
         {
           Author {
             AuthorFindOne(filter: { where: {id: 3}}) {
@@ -199,7 +198,7 @@ describe('Queries', () => {
     });
 
     it('findById', () => {
-      const query = gql `
+      const query = `
         {
           Author {
             AuthorFindById(id: 3) {
@@ -222,7 +221,7 @@ describe('Queries', () => {
     });
 
     it('find', () => {
-      const query = gql `
+      const query = `
         {
           Book {
             BookFind {
@@ -247,7 +246,7 @@ describe('Queries', () => {
     });
 
     it('should call a remoteHook and return the related data', () => {
-      const query = gql `
+      const query = `
         {
           Customer {
             CustomerFindById(id: 3) {
@@ -289,7 +288,7 @@ describe('Queries', () => {
 
   describe('Custom Remote methods', () =>{
     it('should run successfully if no param is provided', (done) => {
-      const query = gql `
+      const query = `
          { Author{ AuthorSearchByName {edges { node }} }  }`;
       chai.request(server)
         .post('/graphql')
@@ -305,7 +304,7 @@ describe('Queries', () => {
     });
 
     it('should run successfully if empty params provided', (done) => {
-      const query = gql `
+      const query = `
          { Author{ AuthorSearchByName (filter:"", p1:"", p2:"") {edges { node }} }  }`;
       chai.request(server)
         .post('/graphql')
@@ -321,7 +320,7 @@ describe('Queries', () => {
     });
 
     it('should run successfully if some params not provided', (done) => {
-      const query = gql `
+      const query = `
          { Author{ AuthorSearchByName (filter:"", p1:"123", p2:"") {edges { node }} }  }`;
       chai.request(server)
         .post('/graphql')
@@ -337,7 +336,7 @@ describe('Queries', () => {
     });
 
     it('should run successfully if empty array is returned', (done) => {
-      const query = gql `
+      const query = `
          { Author{ AuthorSearchByName {edges { node }} }  }`;
       chai.request(server)
         .post('/graphql')
@@ -353,7 +352,7 @@ describe('Queries', () => {
     });
 
     it('should run successfully data is returned', (done) => {
-      const query = gql `
+      const query = `
          { Author{ AuthorSearchByName (filter:{name:"Unit Test"}){edges { node }} }  }`;
       chai.request(server)
         .post('/graphql')
@@ -370,7 +369,7 @@ describe('Queries', () => {
     });
 
     it('should return first record', (done) => {
-      const query = gql `
+      const query = `
          { Author{ AuthorSearchByName (filter:{name:"Unit Test"}, first:1){edges { node }} }  }`;
       chai.request(server)
         .post('/graphql')
