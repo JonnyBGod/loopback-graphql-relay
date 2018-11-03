@@ -15,7 +15,7 @@ function getSchema(models, options) {
 
   if (options && options.subscriptionServer &&
       options.subscriptionServer.disable !== true) {
-    items.subscription = getSubscription(models);
+    items.subscription = getSubscription(models, options);
   }
 
   const schema = new GraphQLSchema(items);

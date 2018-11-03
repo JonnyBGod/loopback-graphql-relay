@@ -1,11 +1,11 @@
 
 const _ = require('lodash');
-const { ApolloServer } = require('apollo-server-express');
+const { ApolloServer, PubSub } = require('apollo-server-express');
 const { getSchema } = require('./schema/index');
 const { execute, subscribe } = require('graphql');
 const http = require('http');
 
-const patchChangeStream = require('./subscriptions/patchChangeStream');
+const patchModelForSubscriptions = require('./subscriptions/patchModelForSubscriptions');
 
 module.exports = function index(app, options) {
   const models = app.models();
@@ -15,8 +15,10 @@ module.exports = function index(app, options) {
   }
 
   if (options.subscriptionServer.disabled !== true) {
-    _.forEach(models, (model) => {
-      patchChangeStream(model);
+    options.subscriptionServer.pubsub = options.subscriptionServer.pubsub || new PubSub();
+
+    _.forEach(models.filter(m => m.config.public), (model) => {
+      patchModelForSubscriptions(model, options);
     });
   }
 
@@ -44,17 +46,11 @@ module.exports = function index(app, options) {
     return false;
   }
 
-  app.apollo = new ApolloServer({
+  const config = {
     schema,
     context: ({ req, connection }) => ({ app, connection, req }),
     tracing: true,
     cacheControl: { defaultMaxAge: 5 },
-    // persistedQueries: {
-    //   cache: new MemcachedCache(
-    //     ['memcached-server-1', 'memcached-server-2', 'memcached-server-3'],
-    //     { retries: 10, retry: 10000 }, // Options
-    //   ),
-    // },
     engine: options.apiKey || app.get('apolloEngineKey') ? {
       apiKey: options.apiKey || app.get('apolloEngineKey'),
     } : false,
@@ -64,7 +60,13 @@ module.exports = function index(app, options) {
       onConnect: wsConnect,
       path: options.path || '/graphql',
     } : false,
-  });
+  };
+
+  if (options.persistedQueries) {
+    config.persistedQueries = options.persistedQueries;
+  }
+
+  app.apollo = new ApolloServer(config);
   app.apollo.applyMiddleware({ app });
 
   if (options.subscriptionServer.disabled !== true) {

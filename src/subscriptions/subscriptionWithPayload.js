@@ -1,7 +1,6 @@
-
 const _ = require('lodash');
-const { MQTTPubSub } = require('@blueeast/graphql-mqtt-subscriptions');
 const { withFilter } = require('apollo-server-express');
+const applyFilter = require('loopback-filters');
 const { getType } = require('../types/type');
 
 const {
@@ -10,17 +9,16 @@ const {
   GraphQLObjectType,
 } = require('graphql');
 
-const loopbackPubSub = new MQTTPubSub();
-
 function resolveMaybeThunk(maybeThunk) {
   return typeof maybeThunk === 'function' ? maybeThunk() : maybeThunk;
 }
 
-function defaultGetPayload(obj) {
-  return (obj && obj.object) ? obj.object : null;
-}
 
-module.exports = function subscriptionWithPayload({ modelName, subscribeAndGetPayload = defaultGetPayload, model }) {
+module.exports = function subscriptionWithPayload({
+  modelName,
+  model,
+  options,
+}) {
   const inputType = new GraphQLInputObjectType({
     name: `${modelName}SubscriptionInput`,
     fields: () => Object.assign(
@@ -56,25 +54,34 @@ module.exports = function subscriptionWithPayload({ modelName, subscribeAndGetPa
     args: {
       input: { type: new GraphQLNonNull(inputType) },
     },
-    resolve(payload, args, context, info) {
-      const clientSubscriptionId = (payload) ? payload.subscriptionId : null;
-
-      const object = (payload) ? payload.object : null;
-      let where = null;
-      let type = null;
-      let target = null;
-      if (object) {
-        where = (payload) ? payload.object.where : null;
-        type = (payload) ? payload.object.type : null;
-        target = (payload) ? payload.object.target : null;
-      }
-
-      return Promise.resolve(subscribeAndGetPayload(payload, args, context, info)).then(resPayload => (
-        {
-          clientSubscriptionId, where, type, target, object: resPayload ? resPayload.data : null,
-        }
-      ));
+    resolve(payload, args) {
+      return Promise.resolve({
+        clientSubscriptionId: args.input.clientSubscriptionId,
+        where: payload.where,
+        type: payload.type,
+        target: payload.target,
+        object: payload.data,
+      });
     },
-    subscribe: withFilter((payload, variables) => loopbackPubSub.asyncIterator(model, variables.input), () => true),
+    subscribe: withFilter(
+      () => options.subscriptionServer.pubsub.asyncIterator(model.name),
+      (payload, variables) => new Promise((resolve) => {
+        if (variables.create && payload.type !== 'create') {
+          return resolve(false);
+        }
+        if (variables.update && payload.type !== 'update') {
+          return resolve(false);
+        }
+        if (variables.remove && payload.type !== 'remove') {
+          return resolve(false);
+        }
+
+        if (variables.input && variables.input.options) {
+          const filtered = applyFilter([payload.data], variables.input.options);
+          return resolve(filtered.length > 0);
+        }
+        return resolve(true);
+      }),
+    ),
   };
 };

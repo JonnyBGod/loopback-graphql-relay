@@ -42,7 +42,6 @@
   },
   "homepage": "https://github.com/BlueEastCode/loopback-graphql-relay#readme",
   "dependencies": {
-    "@blueeast/graphql-mqtt-subscriptions": "2.1.7",
     "apollo-cache-inmemory": "^1.3.8",
     "apollo-server-express": "^2.1.0",
     "async": "^2.6.1",
@@ -95,6 +94,7 @@
     "sinon": "^7.1.1",
     "standard-version": "^4.4.0",
     "strong-error-handler": "^3.0.0",
+    "subscriptions-transport-ws": "^0.9.15",
     "validate-commit-msg": "^2.14.0"
   },
   "config": {

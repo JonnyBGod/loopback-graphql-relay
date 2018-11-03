@@ -6,7 +6,7 @@
 
 Combine the powers of [ApolloStack](http://www.apollostack.com/) GraphQL with the backend of Loopback to automatically generate GraphQL endpoints based on Loopback Schema.
 
-![Loopback Graphql](./resources/loopback-graphql.png?raw=true "LoopBack Apollo Architecture") 
+![Loopback Graphql](./resources/loopback-graphql.png?raw=true "LoopBack Apollo Architecture")
 
 ## Caution ⚠️
 This is a work in progress. Until version 1.0 endpoint API may change.
@@ -64,17 +64,13 @@ This is a work in progress. Until version 1.0 endpoint API may change.
 ```sh
 npm install loopback-graphql-relay
 ```
-Add the loopback-graphql-relay component to the `server/component-config.json`: 
+Add the loopback-graphql-relay component to the `server/component-config.json`:
 
 ```
 "loopback-graphql-relay": {
     "path": "/graphql",
-    "graphiqlPath": "/graphiql",
     "subscriptionServer": {
       "disable": false,
-      "port": 5000,
-      "options": {},
-      "socketOptions": {}
     },
     "viewer": {
       "AccessTokenModel": "CustomAccessToken",
@@ -86,9 +82,42 @@ Add the loopback-graphql-relay component to the `server/component-config.json`:
 
 Requests will be posted to `path` path. (Default: `/graphql`);
 
-Graphiql is available on `graphiqlPath` path. (Default: `/graphiql`);
+GraphQl Playground is available on `path` path. (Default: `/graphql`);
 
 Apollo's Subscription Server can be customised by passing `subscriptionServer` configuration. More information can be found at [SubscriptionServer Docs](https://github.com/apollographql/subscriptions-transport-ws#subscriptionserver).
+
+```
+const { RedisPubSub } = require('graphql-redis-subscriptions')
+...
+
+subscriptionServer: {
+  disable: false,
+  pubsub: new RedisPubSub({
+    connection: {
+      host: 'cluster-redis-master.default.svc.cluster.local',
+      retry_strategy: options => {
+        // reconnect after
+        return Math.max(options.attempt * 100, 3000)
+      }
+    }
+  })
+},
+```
+
+```
+const { RedisCache } = require('apollo-server-cache-redis')
+...
+
+persistedQueries: {
+  cache: new RedisCache({
+    host: 'cluster-redis-master.default.svc.cluster.local',
+    retry_strategy: options => {
+      // reconnect after
+      return Math.max(options.attempt * 100, 3000)
+    }
+  })
+}
+```
 
 ## Inspiration 🙌
 This repository originally started as a fork of the [loopback-graphql](https://github.com/Tallyb/loopback-graphql) project by [Tallyb](https://github.com/Tallyb). But due to considerable change in the way query end points are created, this repository is maitained as an independant project.

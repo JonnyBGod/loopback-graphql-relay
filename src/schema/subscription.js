@@ -1,23 +1,15 @@
 const _ = require('lodash');
 const { GraphQLObjectType } = require('graphql');
-const { getType } = require('../types/type');
 const subWithPayload = require('../subscriptions/subscriptionWithPayload');
 
-function addModel(model) {
+function addModel(model, options) {
   const fields = {};
   const modelName = `${model.modelName}`;
 
-  const outputFields = {
-    obj: {
-      type: getType(modelName),
-      resolve: o => o,
-    },
-  };
-
   const subscriptionWithPayload = subWithPayload({
     modelName,
-    outputFields,
     model,
+    options,
   });
 
   fields[modelName] = subscriptionWithPayload;
@@ -25,14 +17,14 @@ function addModel(model) {
   return fields;
 }
 
-module.exports = function subscriptions(models) {
+module.exports = function subscriptions(models, options) {
   const fields = {};
-  _.forEach(models, (model) => {
+  _.forEach(models.filter(m => m.config.public), (model) => {
     if (!model.shared) {
       return;
     }
 
-    Object.assign(fields, addModel(model));
+    Object.assign(fields, addModel(model, options));
   });
 
   return new GraphQLObjectType({
