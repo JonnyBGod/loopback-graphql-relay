@@ -29,7 +29,7 @@ const SCALARS = {
   number: 'Float',
   string: 'String',
   boolean: 'Boolean',
-  objectid: 'ID',
+  objectid: 'ObjectID',
   date: 'Date',
   object: 'JSON',
   now: 'Date',

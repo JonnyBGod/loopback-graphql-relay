@@ -8,6 +8,7 @@ const {
   GraphQLFloat,
   GraphQLInt,
 } = require('graphql');
+const GraphQLObjectID = require('./ObjectID');
 
 const { connectionDefinitions } = require('graphql-relay');
 
@@ -30,6 +31,9 @@ const getScalar = (name) => {
 
     case 'String':
       return GraphQLString;
+
+    case 'ObjectID':
+      return GraphQLObjectID;
 
     case 'Boolean':
       return GraphQLBoolean;

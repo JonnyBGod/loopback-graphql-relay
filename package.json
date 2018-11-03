@@ -46,6 +46,7 @@
     "apollo-server-express": "^2.1.0",
     "async": "^2.6.1",
     "body-parser": "^1.18.3",
+    "bson-objectid": "^1.2.4",
     "chai-as-promised": "^7.1.1",
     "event-stream": "^4.0.1",
     "graphql": "^14.0.2",
