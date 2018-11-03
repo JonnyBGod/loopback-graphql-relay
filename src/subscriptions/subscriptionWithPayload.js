@@ -4,6 +4,8 @@ const applyFilter = require('loopback-filters');
 const { getType } = require('../types/type');
 const checkAccess = require('../schema/acl');
 
+const utils = require('../db/utils');
+
 const {
   GraphQLInputObjectType,
   GraphQLNonNull,
@@ -20,6 +22,7 @@ module.exports = function subscriptionWithPayload({
   model,
   options,
 }) {
+  const idName = (model && model.getIdName()) ? model.getIdName() : 'id';
   const method = model.sharedClass.methods().filter(m => m.name === 'findOne');
 
   const inputType = new GraphQLInputObjectType({
@@ -47,7 +50,8 @@ module.exports = function subscriptionWithPayload({
       resolveMaybeThunk(outputFields),
       { where: { type: getType('JSON') } },
       { type: { type: getType('String') } },
-      { target: { type: getType('String') } },
+      { target: { type: getType('ID') } },
+      { cursor: { type: getType('String') } },
       { clientSubscriptionId: { type: getType('Int') } },
     ),
   });
@@ -59,6 +63,7 @@ module.exports = function subscriptionWithPayload({
     },
     resolve(payload, args) {
       return Promise.resolve(Object.assign({}, payload, {
+        cursor: utils.idToCursor(payload.object[idName]),
         clientSubscriptionId: args.input.clientSubscriptionId,
       }));
     },

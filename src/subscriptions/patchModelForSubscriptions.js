@@ -7,9 +7,9 @@ module.exports = function patchModelForSubscriptions(PatchModel, options) {
       const idName = PatchModel.getIdName();
 
       if (object && (object[idName] || object[idName] === 0)) {
-        target = object[idName];
+        target = typeof object[idName] === 'string' ? object[idName] : object[idName].toString();
       } else if (where && (where[idName] || where[idName] === 0)) {
-        target = where[idName];
+        target = typeof where[idName] === 'string' ? where[idName] : where[idName].toString();
       }
 
       const hasTarget = target === 0 || !!target;
