@@ -2,12 +2,12 @@ module.exports = function patchModelForSubscriptions(PatchModel, options) {
   function createSubscriptionHandler(type) {
     return function (ctx, next) { // eslint-disable-line
       const { where } = ctx;
-      const data = ctx.instance || ctx.data;
+      const object = ctx.instance || ctx.data;
       let target;
       const idName = PatchModel.getIdName();
 
-      if (data && (data[idName] || data[idName] === 0)) {
-        target = data[idName];
+      if (object && (object[idName] || object[idName] === 0)) {
+        target = object[idName];
       } else if (where && (where[idName] || where[idName] === 0)) {
         target = where[idName];
       }
@@ -17,7 +17,7 @@ module.exports = function patchModelForSubscriptions(PatchModel, options) {
       const change = {
         target,
         where,
-        data,
+        object,
       };
 
       switch (type) {

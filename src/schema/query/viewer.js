@@ -45,9 +45,9 @@ function getRelatedModelFields(User) {
       }, connectionArgs),
       type: getConnection(model.modelName),
       resolve: (obj, args, context) => {
-        if (!context.req || !context.req.accessToken) return null;
+        if (!context.accessToken) return null;
 
-        return findUserFromAccessToken(context.req.accessToken, User)
+        return findUserFromAccessToken(context.accessToken, User)
           .then(user => connectionFromPromisedArray(findAllRelated(User, user, relation.name, args, context), args, model));
       },
     };
@@ -65,10 +65,10 @@ function getMeField(User) {
   return {
     me: {
       type: getType(User.modelName),
-      resolve: (obj, args, { req }) => {
-        if (!req.accessToken) return null;
+      resolve: (obj, args, context) => {
+        if (!context.accessToken) return null;
 
-        return findUserFromAccessToken(req.accessToken, User);
+        return findUserFromAccessToken(context.accessToken, User);
       },
     },
   };
@@ -80,8 +80,6 @@ function getMeField(User) {
  */
 module.exports = function viewer(models, options) {
   const opts = Object.assign({}, {
-    AccessTokenModel: 'AccessToken',
-    relation: 'user',
     UserModel: 'User',
   }, options.viewer || {});
 

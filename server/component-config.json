@@ -4,16 +4,11 @@
   },
   "../index": {
     "path": "/graphql",
-    "graphiqlPath": "/graphiql",
     "viewer": {
-      "AccessTokenModel": "CustomAccessToken",
-      "relation": "user",
       "UserModel": "Account"
     },
     "subscriptionServer": {
-      "disable": false,
-      "options": {},
-      "socketOptions": {}
+      "disable": false
     }
   }
 }

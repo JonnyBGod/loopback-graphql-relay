@@ -8,9 +8,6 @@ Combine the powers of [ApolloStack](http://www.apollostack.com/) GraphQL with th
 
 ![Loopback Graphql](./resources/loopback-graphql.png?raw=true "LoopBack Apollo Architecture")
 
-## Caution ⚠️
-This is a work in progress. Until version 1.0 endpoint API may change.
-
 ## Queries 💥
 - Relay Specification: `node` query to fetch single entity by ID
 - `viewer` query to fetch all models for a viewer
@@ -54,6 +51,7 @@ This is a work in progress. Until version 1.0 endpoint API may change.
 
 ### Misc
 - Accepts AccessToken for authenticated API calls
+- Resolves and respects ACLs
 
 ### Todo
 - [ ] File uploads
@@ -71,10 +69,9 @@ Add the loopback-graphql-relay component to the `server/component-config.json`:
     "path": "/graphql",
     "subscriptionServer": {
       "disable": false,
+      "auth": false
     },
     "viewer": {
-      "AccessTokenModel": "CustomAccessToken",
-      "relation": "user",
       "UserModel": "Account"
     }
   }
@@ -84,7 +81,7 @@ Requests will be posted to `path` path. (Default: `/graphql`);
 
 GraphQl Playground is available on `path` path. (Default: `/graphql`);
 
-Apollo's Subscription Server can be customised by passing `subscriptionServer` configuration. More information can be found at [SubscriptionServer Docs](https://github.com/apollographql/subscriptions-transport-ws#subscriptionserver).
+Apollo's Subscription Server can be customised by passing `subscriptionServer` configuration. More information can be found at [Subscriptions Docs](https://www.apollographql.com/docs/apollo-server/features/subscriptions.html).
 
 ```
 const { RedisPubSub } = require('graphql-redis-subscriptions')
@@ -103,6 +100,8 @@ subscriptionServer: {
   })
 },
 ```
+
+Apollo's persistent queries can be customised by passing `persistedQueries` configuration. More information can be found at [Performance Docs](https://www.apollographql.com/docs/guides/performance.html).
 
 ```
 const { RedisCache } = require('apollo-server-cache-redis')

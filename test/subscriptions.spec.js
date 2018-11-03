@@ -17,7 +17,7 @@ let networkInterface;
 let app
 const GRAPHQL_ENDPOINT = 'ws://localhost:2000/graphql';
 
-describe('Subscription', () => {
+describe('Subscriptions', () => {
   before(() => Promise.fromCallback(cb => cpx.copy('./data.json', './data/', cb)));
   before(() => app = server.start());
   before(async () => {
@@ -59,7 +59,7 @@ describe('Subscription', () => {
       const client = () => apollo;
       client().subscribe(options).subscribe({
         next: (res) => {
-          console.log('next', res, times)
+          console.log('next', res)
           return resolve(res)
         },
         error: (err) => {
@@ -90,7 +90,6 @@ describe('Subscription', () => {
         expect(res).to.have.status(200);
         // ASSERT SUBSCRIPTION RECEIVED EVENT
         const promiseResult = await subscriptionPromise
-        console.log(promiseResult)
         expect(promiseResult.data).to.deep.equal({
           Customer: {
             __typename: 'CustomerSubscriptionPayload',

@@ -2,6 +2,7 @@ const _ = require('lodash');
 const { withFilter } = require('apollo-server-express');
 const applyFilter = require('loopback-filters');
 const { getType } = require('../types/type');
+const checkAccess = require('../schema/acl');
 
 const {
   GraphQLInputObjectType,
@@ -19,6 +20,8 @@ module.exports = function subscriptionWithPayload({
   model,
   options,
 }) {
+  const method = model.sharedClass.methods().filter(m => m.name === 'findOne');
+
   const inputType = new GraphQLInputObjectType({
     name: `${modelName}SubscriptionInput`,
     fields: () => Object.assign(
@@ -55,17 +58,13 @@ module.exports = function subscriptionWithPayload({
       input: { type: new GraphQLNonNull(inputType) },
     },
     resolve(payload, args) {
-      return Promise.resolve({
+      return Promise.resolve(Object.assign({}, payload, {
         clientSubscriptionId: args.input.clientSubscriptionId,
-        where: payload.where,
-        type: payload.type,
-        target: payload.target,
-        object: payload.data,
-      });
+      }));
     },
     subscribe: withFilter(
       () => options.subscriptionServer.pubsub.asyncIterator(model.name),
-      (payload, variables) => new Promise((resolve) => {
+      (payload, variables, context) => new Promise((resolve) => {
         if (variables.create && payload.type !== 'create') {
           return resolve(false);
         }
@@ -77,11 +76,11 @@ module.exports = function subscriptionWithPayload({
         }
 
         if (variables.input && variables.input.options) {
-          const filtered = applyFilter([payload.data], variables.input.options);
+          const filtered = applyFilter([payload.object], variables.input.options);
           return resolve(filtered.length > 0);
         }
         return resolve(true);
-      }),
+      }).then(() => checkAccess(context, model, method[0], payload.object && payload.object.id).then(() => true)),
     ),
   };
 };

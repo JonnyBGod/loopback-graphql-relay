@@ -34,21 +34,26 @@ module.exports = function index(app, options) {
 
     accessToken.resolve(authToken, (err, token) => {
       if (token) {
-        resolve();
+        resolve({ accessToken: token });
       } else reject(err);
     });
   });
 
   function wsConnect(connectionParams) {
     if (options.subscriptionServer.auth && connectionParams.authToken) {
-      return validateToken(connectionParams.authToken).then(() => true).catch(() => false);
+      return validateToken(connectionParams.authToken).catch(() => false);
     } else if (!options.subscriptionServer.auth) return true;
     return false;
   }
 
   const config = {
     schema,
-    context: ({ req, connection }) => ({ app, connection, req }),
+    context: async ({ req, connection }) => {
+      if (connection) {
+        return { app, accessToken: connection.context.accessToken };
+      }
+      return { app, accessToken: req.accessToken };
+    },
     tracing: true,
     cacheControl: { defaultMaxAge: 5 },
     engine: options.apiKey || app.get('apolloEngineKey') ? {

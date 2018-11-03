@@ -8,8 +8,8 @@ const {
 const promisify = require('promisify-node');
 const { connectionFromPromisedArray } = require('graphql-relay');
 
+const checkAccess = require('../acl');
 const utils = require('../utils');
-// const { getType } = require('../../types/type');
 
 const allowedVerbs = ['post', 'del', 'put', 'patch', 'all'];
 
@@ -82,34 +82,36 @@ module.exports = function getRemoteMethodMutations(model) {
               resolve: o => o,
             },
           },
-          mutateAndGetPayload: async (args) => {
+          mutateAndGetPayload: (args, context) => {
             const params = [];
 
             _.forEach(acceptingParams, (param, name) => {
               params.push(args[name]);
             });
-            const wrap = promisify(model[method.name]);
+            return checkAccess(context, model, method, args && args.id).then(async () => {
+              const wrap = promisify(model[method.name]);
 
-            if (typeObj.list) {
-              return connectionFromPromisedArray(wrap.apply(model, params), args, model);
-            }
-
-            // HACK to support mutation for loopback methods that do not return anything
-            if (!method.returns || !method.returns.length) {
-              return wrap.apply(model, params).then(response => (response || {}));
-            }
-
-            const result = await wrap.apply(model, params);
-
-            if (method.name === 'create' || method.name === 'update') {
-              const relationProms = [];
-              for (const key of Object.keys(model.relations)) {
-                const relation = model.relations[key];
-                relationProms.push(resolveRelation(result, params[0], model, relation));
+              if (typeObj.list) {
+                return connectionFromPromisedArray(wrap.apply(model, params), args, model);
               }
-              await Promise.all(relationProms);
-            }
-            return result;
+
+              // HACK to support mutation for loopback methods that do not return anything
+              if (!method.returns || !method.returns.length) {
+                return wrap.apply(model, params).then(response => (response || {}));
+              }
+
+              const result = await wrap.apply(model, params);
+
+              if (method.name === 'create' || method.name === 'update') {
+                const relationProms = [];
+                for (const key of Object.keys(model.relations)) {
+                  const relation = model.relations[key];
+                  relationProms.push(resolveRelation(result, params[0], model, relation));
+                }
+                await Promise.all(relationProms);
+              }
+              return Promise.resolve(result);
+            });
           },
         });
       }
