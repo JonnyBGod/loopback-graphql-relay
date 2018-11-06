@@ -8,10 +8,10 @@ const {
   GraphQLFloat,
   GraphQLInt,
 } = require('graphql');
-const GraphQLObjectID = require('./ObjectID');
 
 const { connectionDefinitions } = require('graphql-relay');
 
+const GraphQLObjectID = require('./ObjectID');
 const CustomGraphQLDateType = require('./Date');
 const GraphQLJSON = require('graphql-type-json');
 

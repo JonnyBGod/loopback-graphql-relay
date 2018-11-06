@@ -1,13 +1,13 @@
 const { GraphQLScalarType } = require('graphql');
 const { Kind } = require('graphql/language');
-const { ObjectID } = require('bson-objectid');
+const ObjectID = require('bson-objectid');
 
 module.exports = new GraphQLScalarType({
   name: 'ObjectID',
   description:
     'The `ObjectID` scalar type represents a [`BSON`](https://en.wikipedia.org/wiki/BSON) ID commonly used in `mongodb`.',
   serialize(_id) {
-    if (_id instanceof ObjectID) {
+    if (typeof _id === 'object' && typeof _id.toHexString !== 'undefined') {
       return _id.toHexString();
     } else if (typeof _id === 'string') {
       return _id;
