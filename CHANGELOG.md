@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.1.3"></a>
+## [2.1.3](https://github.com/BlueEastCode/loopback-graphql-relay/compare/v2.1.2...v2.1.3) (2018-11-07)
+
+
+### Bug Fixes
+
+* **acl:** mutation resolver ([7206f54](https://github.com/BlueEastCode/loopback-graphql-relay/commit/7206f54))
+* **core:** support array for objectIds ([2cdf65e](https://github.com/BlueEastCode/loopback-graphql-relay/commit/2cdf65e))
+* **viewer:** consolidate arguments ([2a349a0](https://github.com/BlueEastCode/loopback-graphql-relay/commit/2a349a0))
+
+
+
 <a name="2.1.2"></a>
 ## [2.1.2](https://github.com/BlueEastCode/loopback-graphql-relay/compare/v2.1.1...v2.1.2) (2018-11-06)
 
