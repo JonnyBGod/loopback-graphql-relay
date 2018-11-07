@@ -88,7 +88,9 @@ module.exports = function getRemoteMethodMutations(model) {
             _.forEach(acceptingParams, (param, name) => {
               params.push(args[name]);
             });
-            return checkAccess(context, model, method, args && args.id).then(async () => {
+
+            const modelId = args && args.data && args.data.id ? args.data.id : args.id;
+            return checkAccess(context, model, method, modelId).then(async () => {
               const wrap = promisify(model[method.name]);
 
               if (typeObj.list) {

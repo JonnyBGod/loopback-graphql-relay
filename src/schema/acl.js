@@ -11,7 +11,7 @@ module.exports = function checkAccess(context, model, method, modelId) {
         context.accessToken,
         modelId,
         method,
-        // ctx,
+        context,
         (err, allowed) => {
           if (err) {
             reject(err);
