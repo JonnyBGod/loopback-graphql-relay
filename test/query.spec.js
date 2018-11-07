@@ -92,7 +92,7 @@ describe('Queries', () => {
       const query = `
         {
           viewer {
-            sites (order: "name DESC") {
+            sites (filter: { order: "name DESC" }) {
               totalCount
               edges {
                 node {

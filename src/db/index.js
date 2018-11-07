@@ -60,15 +60,15 @@ function findAllRelated(model, obj, method, args) {
   return new Promise((resolve, reject) => {
     waterfall([
       (callback) => {
-        obj[`__count__${method}`](args.where, callback);
+        obj[`__count__${method}`](args.filter && args.filter.where, callback);
       },
       (count, callback) => {
         response.count = count;
 
         const idName = (model.getIdName && model.getIdName()) ? model.getIdName() : 'id';
         obj[`__findOne__${method}`]({
-          order: idName + (args.before ? ' DESC' : ' ASC'),
-          where: args.where,
+          order: args.order || (idName + (args.before ? ' DESC' : ' ASC')),
+          where: args.filter && args.filter.where,
         }, callback);
       },
       (first, callback) => {

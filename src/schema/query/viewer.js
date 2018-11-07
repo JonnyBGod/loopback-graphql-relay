@@ -36,16 +36,18 @@ function getRelatedModelFields(User) {
 
     fields[_.lowerFirst(relation.name)] = {
       args: Object.assign({
-        where: {
+        filter: {
           type: getType('JSON'),
         },
-        order: {
+        options: {
           type: getType('JSON'),
         },
       }, connectionArgs),
       type: getConnection(model.modelName),
       resolve: (obj, args, context) => {
         if (!context.accessToken) return null;
+
+        args.order = args.filter && args.filter.order;
 
         return findUserFromAccessToken(context.accessToken, User)
           .then(user => connectionFromPromisedArray(findAllRelated(User, user, relation.name, args, context), args, model));
