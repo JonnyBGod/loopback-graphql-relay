@@ -85,10 +85,16 @@ Apollo's Subscription Server can be customised by passing `subscriptionServer` c
 
 ```
 const { RedisPubSub } = require('graphql-redis-subscriptions')
+const path = require('path')
+const fs = require('fs')
 ...
 
 subscriptionServer: {
   disable: false,
+  https: {
+    key: fs.readFileSync(path.join(__dirname, '.certs/example.key')).toString(),
+    cert: fs.readFileSync(path.join(__dirname, '.certs/example.crt')).toString()
+  },
   pubsub: new RedisPubSub({
     connection: {
       host: 'cluster-redis-master.default.svc.cluster.local',

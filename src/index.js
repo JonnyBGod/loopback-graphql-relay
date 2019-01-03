@@ -4,6 +4,7 @@ const { ApolloServer, PubSub } = require('apollo-server-express');
 const { getSchema } = require('./schema/index');
 const { execute, subscribe } = require('graphql');
 const http = require('http');
+const https = require('https');
 
 const patchModelForSubscriptions = require('./subscriptions/patchModelForSubscriptions');
 
@@ -50,9 +51,9 @@ module.exports = function index(app, options) {
     schema,
     context: async ({ req, connection }) => {
       if (connection) {
-        return { app, accessToken: connection.context.accessToken };
+        return { app, req, accessToken: connection.context.accessToken };
       }
-      return { app, accessToken: req.accessToken };
+      return { app, req, accessToken: req.accessToken };
     },
     tracing: true,
     cacheControl: { defaultMaxAge: 5 },
@@ -75,7 +76,12 @@ module.exports = function index(app, options) {
   app.apollo.applyMiddleware({ app });
 
   if (options.subscriptionServer.disabled !== true) {
-    const subsServer = http.createServer(app);
+    let subsServer;
+    if (options.subscriptionServer.https) {
+      subsServer = https.createServer(options.subscriptionServer.https, app);
+    } else {
+      subsServer = http.createServer(app);
+    }
     app.apollo.installSubscriptionHandlers(subsServer);
     app.listen = function listen(port, cb) {
       if (typeof port === 'function' && typeof cb === 'undefined') {
