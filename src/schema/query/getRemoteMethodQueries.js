@@ -43,7 +43,7 @@ module.exports = function getRemoteMethodQueries(model) {
               params.push(args[name]);
             });
 
-            return checkAccess(context, model, method, args && args.id).then(() => {
+            return checkAccess(context, model, method, args && args.id, args).then(() => {
               const wrap = promisify(model[method.name]);
 
               if (typeObj.list) {
