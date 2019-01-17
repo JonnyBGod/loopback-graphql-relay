@@ -1,4 +1,4 @@
-module.exports = function checkAccess(context, model, method, modelId) {
+module.exports = function checkAccess(context, model, method, modelId, args) {
   return new Promise((resolve, reject) => {
     const modelSettings = model.settings || {};
     let errStatusCode = modelSettings.aclErrorStatus || context.app.get('aclErrorStatus') || 401;
@@ -11,7 +11,7 @@ module.exports = function checkAccess(context, model, method, modelId) {
         context.accessToken,
         modelId,
         method,
-        context,
+        Object.assign({}, context, { args }),
         (err, allowed) => {
           if (err) {
             reject(err);

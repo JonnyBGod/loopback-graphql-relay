@@ -85,7 +85,7 @@ module.exports = function subscriptionWithPayload({
           return resolve(filtered.length > 0);
         }
         return resolve(true);
-      }).then(() => checkAccess(context, model, method[0], payload.object && payload.object.id).then(() => true)),
+      }).then(() => checkAccess(context, model, method[0], payload.object && payload.object.id, payload.object).then(() => true)),
     ),
   };
 };

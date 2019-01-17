@@ -90,7 +90,7 @@ module.exports = function getRemoteMethodMutations(model) {
             });
 
             const modelId = args && args.data && args.data.id ? args.data.id : args.id;
-            return checkAccess(context, model, method, modelId).then(async () => {
+            return checkAccess(context, model, method, modelId, args).then(async () => {
               const wrap = promisify(model[method.name]);
 
               if (typeObj.list) {
