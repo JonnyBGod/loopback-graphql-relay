@@ -127,11 +127,13 @@ function findRelatedMany(rel, obj, args, context) {
   }
 
   let andArray = []
-  for(let i = 0; i < Object.keys(args.where).length; i++) {
-    Object.keys(args.where)[i]
-    andArray.push({
-      [Object.keys(args.where)[i]]: args.where[Object.keys(args.where)[i]]
-    })
+  if(args.where && Object.keys(args.where).length > 0) {
+    for(let i = 0; i < Object.keys(args.where).length; i++) {
+      Object.keys(args.where)[i]
+      andArray.push({
+        [Object.keys(args.where)[i]]: args.where[Object.keys(args.where)[i]]
+      })
+    }
   }
 
   if (_.isArray(obj[rel.keyFrom])) {
@@ -144,7 +146,7 @@ function findRelatedMany(rel, obj, args, context) {
     });
   }
   
-  args.where.and = andArray
+  args.where = {and: andArray}
 
   return findAll(rel.modelTo, obj, args, context);
 }
