@@ -126,27 +126,20 @@ function findRelatedMany(rel, obj, args, context) {
     return findAllViaThrough(rel, obj, args, context);
   }
 
-  let andArray = []
-  if(args.where && Object.keys(args.where).length > 0) {
-    for(let i = 0; i < Object.keys(args.where).length; i++) {
-      Object.keys(args.where)[i]
+  const andArray = [];
+  if (args.where && Object.keys(args.where).length > 0) {
+    Object.keys(args.where).forEach((value) => {
       andArray.push({
-        [Object.keys(args.where)[i]]: args.where[Object.keys(args.where)[i]]
-      })
-    }
+        [value]: args.where[value],
+      });
+    });
   }
 
-  if (_.isArray(obj[rel.keyFrom])) {
-    andArray.push({
-      [rel.keyTo]: { inq: obj[rel.keyFrom] },
-    });
-  } else {
-    andArray.push({
-      [rel.keyTo]: obj[rel.keyFrom],
-    });
-  }
-  
-  args.where = {and: andArray}
+  andArray.push({
+    [rel.keyTo]: _.isArray(obj[rel.keyFrom]) ? { inq: obj[rel.keyFrom] } : obj[rel.keyFrom],
+  });
+
+  args.where = { and: andArray };
 
   return findAll(rel.modelTo, obj, args, context);
 }
