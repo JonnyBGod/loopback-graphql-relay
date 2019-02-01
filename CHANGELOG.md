@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.1.7"></a>
+## [2.1.7](https://github.com/BlueEastCode/loopback-graphql-relay/compare/v2.1.6...v2.1.7) (2019-02-01)
+
+
+### Bug Fixes
+
+* **core:** 'where' clause for nested documents ([717f285](https://github.com/BlueEastCode/loopback-graphql-relay/commit/717f285))
+
+
+
 <a name="2.1.6"></a>
 ## [2.1.6](https://github.com/BlueEastCode/loopback-graphql-relay/compare/v2.1.5...v2.1.6) (2019-01-17)
 
