@@ -54,7 +54,7 @@ async function resolveRelation(instance, values, model, relation) {
 
 module.exports = function getRemoteMethodMutations(model) {
   const hooks = {};
-
+  // console.log(model.app.remotes().execHooks)
   if (model.sharedClass && model.sharedClass.methods) {
     model.sharedClass.methods().forEach((method) => {
       if (method.shared && method.name.indexOf('Stream') === -1 && method.name.indexOf('invoke') === -1) {
@@ -66,10 +66,11 @@ module.exports = function getRemoteMethodMutations(model) {
         if (method.isStatic === false) {
           return;
         }
-
+        // console.log(model.app.remotes())
         const typeObj = utils.getRemoteMethodOutput(method);
         const acceptingParams = utils.getRemoteMethodInput(method, typeObj.list);
         const hookName = utils.getRemoteMethodQueryName(model, method);
+        // console.log(hookName)
 
         hooks[hookName] = mutationWithClientMutationId({
           name: hookName,
@@ -89,29 +90,43 @@ module.exports = function getRemoteMethodMutations(model) {
               params.push(args[name]);
             });
 
+            context.args = args;
             const modelId = args && args.data && args.data.id ? args.data.id : args.id;
+
             return checkAccess(context, model, method, modelId, args).then(async () => {
+              const beforeErr = await utils.execHooks(model.app, model, args.data, 'before', method, context);
+              if (beforeErr) {
+                return Promise.reject(beforeErr);
+              }
+
               const wrap = promisify(model[method.name]);
 
+              let result;
               if (typeObj.list) {
-                return connectionFromPromisedArray(wrap.apply(model, params), args, model);
-              }
+                result = await connectionFromPromisedArray(wrap.apply(model, params), args, model);
+              } else if (!method.returns || !method.returns.length) {
+                // HACK to support mutation for loopback methods that do not return anything
+                result = await wrap.apply(model, params).then(response => (response || {}));
+              } else {
+                result = await wrap.apply(model, params);
 
-              // HACK to support mutation for loopback methods that do not return anything
-              if (!method.returns || !method.returns.length) {
-                return wrap.apply(model, params).then(response => (response || {}));
-              }
-
-              const result = await wrap.apply(model, params);
-
-              if (method.name === 'create' || method.name === 'update') {
-                const relationProms = [];
-                for (const key of Object.keys(model.relations)) {
-                  const relation = model.relations[key];
-                  relationProms.push(resolveRelation(result, params[0], model, relation));
+                if (method.name === 'create' || method.name === 'update') {
+                  const relationProms = [];
+                  for (const key of Object.keys(model.relations)) {
+                    const relation = model.relations[key];
+                    relationProms.push(resolveRelation(result, params[0], model, relation));
+                  }
+                  await Promise.all(relationProms);
                 }
-                await Promise.all(relationProms);
               }
+
+              context.result = result;
+
+              const afterErr = await utils.execHooks(model.app, model, args.data, 'after', method, context);
+              if (afterErr) {
+                return Promise.reject(afterErr);
+              }
+
               return Promise.resolve(result);
             });
           },

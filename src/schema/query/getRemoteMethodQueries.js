@@ -43,8 +43,16 @@ module.exports = function getRemoteMethodQueries(model) {
               params.push(args[name]);
             });
 
-            return checkAccess(context, model, method, args && args.id, args).then(() => {
+            context.args = args;
+
+            return checkAccess(context, model, method, args && args.id, args).then(async () => {
+              const beforeErr = await utils.execHooks(model.app, model, args.data, 'before', method, context);
+              if (beforeErr) {
+                return Promise.reject(beforeErr);
+              }
+
               const wrap = promisify(model[method.name]);
+              let result;
 
               if (typeObj.list) {
                 if (defaultFindMethods.indexOf(method.name) !== -1 || method.returns[0].type.indexOf('any') !== -1) {
@@ -54,10 +62,19 @@ module.exports = function getRemoteMethodQueries(model) {
                   });
                 }
 
-                return connectionFromPromisedArray(wrap.apply(model, params), args, model);
+                result = await connectionFromPromisedArray(wrap.apply(model, params), args, model);
+              } else {
+                result = await wrap.apply(model, params);
               }
 
-              return wrap.apply(model, params);
+              context.result = result;
+
+              const afterErr = await utils.execHooks(model.app, model, args.data, 'after', method, context);
+              if (afterErr) {
+                return Promise.reject(afterErr);
+              }
+
+              return result;
             });
           },
         };

@@ -171,7 +171,43 @@ describe('Mutations', () => {
         expect(res).to.have.status(200);
         expect(res.body).to.have.property('errors');
       }).catch((err) => {
-        console.log(err);
+        throw err;
+      });
+  });
+
+  it('should trigger remote hooks', () => {
+    const query = `
+    mutation NoteCreate($input: NoteCreateInput!) {
+      Note {
+        NoteCreate(input: $input) {
+          obj {
+            id
+            title
+            Genre
+          }
+        }
+      }
+    }`;
+
+    const variables = {
+      input: {
+        "data": {
+          "title": "test",
+        },
+      },
+    };
+
+    return chai.request(server)
+      .post('/graphql')
+      .send({
+        query,
+        variables,
+      })
+      .then((res) => {
+        expect(res).to.have.status(200);
+        expect(res.body.data.Note.NoteCreate.obj.Genre).to.equal('injected by remote hook')
+      }).catch((err) => {
+        throw err;
       });
   });
 });

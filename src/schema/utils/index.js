@@ -116,10 +116,52 @@ function getRemoteMethodQueryName(model, method) {
   return `${model.modelName}${_.upperFirst(method.name)}`;
 }
 
+/**
+ * Trigger execution of remote hooks of a model
+ *
+ * @param app The loopback application
+ * @param model The model
+ * @param data The model data
+ * @param when The possible values are 'before' or 'after'
+ * @param method The remote method name
+ * @param ctx The hooks context
+ * @param next
+ */
+function execHooks(app, model, data, when, method, ctx) {
+  return new Promise((resolve) => {
+    // Save original context values
+    const originalData = ctx.args.data || {};
+    const originalMethod = ctx.method || method;
+
+    // Get shared method
+    const remotes = app.remotes();
+    const modelSharedClass = remotes.classes().filter(item => item.name === model.modelName)[0];
+    const modelSharedMethod = modelSharedClass.methods().filter(item => item.name === method.name)[0];
+
+    // Change context data
+    ctx.args.data = data;
+    ctx.method = modelSharedMethod;
+    ctx.methodString = modelSharedMethod.stringName;
+
+    // Execute hooks
+    const remoteObject = app.remoteObjects()[model.modelName];
+    return remotes.execHooks(when, modelSharedMethod, remoteObject, ctx, (err) => {
+      // Restore context data
+      // const changedData = ctx.args.data;
+      ctx.args.data = originalData;
+      ctx.method = originalMethod;
+      ctx.methodString = originalMethod.stringName;
+
+      return resolve(err);
+    });
+  });
+}
+
 module.exports = {
   exchangeTypes,
   isRemoteMethodAllowed,
   getRemoteMethodInput,
   getRemoteMethodOutput,
   getRemoteMethodQueryName,
+  execHooks,
 };

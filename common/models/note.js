@@ -22,4 +22,11 @@ module.exports = function(Note) {
         type: 'Date',
       }],
     });
+
+  Note.afterRemote('create', function(ctx, note, next) {
+    if (ctx.result && !ctx.result.Genre) {
+      ctx.result.Genre = 'injected by remote hook'
+    }
+    next()
+  });
 };

@@ -49,11 +49,15 @@ module.exports = function index(app, options) {
 
   const config = {
     schema,
-    context: async ({ req, connection }) => {
+    context: async ({ req, res, connection }) => {
       if (connection) {
-        return { app, req, accessToken: connection.context.accessToken };
+        return {
+          app, req, res, accessToken: connection.context.accessToken,
+        };
       }
-      return { app, req, accessToken: req.accessToken };
+      return {
+        app, req, res, accessToken: req.accessToken,
+      };
     },
     tracing: true,
     cacheControl: { defaultMaxAge: 5 },
