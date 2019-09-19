@@ -6,6 +6,8 @@ const { HttpLink } = require('apollo-link-http');
 const { InMemoryCache } = require('apollo-cache-inmemory');
 const cpx = require('cpx');
 
+const fetch = require('node-fetch');
+
 const Promise = require('bluebird');
 const expect = require('chai').expect;
 const chai = require('chai').use(require('chai-http'));
@@ -24,7 +26,7 @@ describe('Subscriptions', () => {
     networkInterface = new SubscriptionClient(GRAPHQL_ENDPOINT, { reconnect: true }, ws);
     apollo = new ApolloClient({
       networkInterface,
-      link: new HttpLink({ uri: 'http://localhost:2000/graphql' }),
+      link: new HttpLink({ uri: 'http://localhost:2000/graphql', fetch: fetch }),
       cache: new InMemoryCache()
     });
   });

@@ -36,7 +36,7 @@ module.exports = function index(models, options) {
     {},
     {
       node: getType('node'),
-      viewer: generateViewer(models, options),
+      viewer: options.disableViewer ? undefined : generateViewer(models, options),
     },
     generateModelFields(models),
   );

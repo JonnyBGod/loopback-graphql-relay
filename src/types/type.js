@@ -13,7 +13,8 @@ const { connectionDefinitions } = require('graphql-relay');
 
 const GraphQLObjectID = require('./ObjectID');
 const CustomGraphQLDateType = require('./Date');
-const GraphQLJSON = require('graphql-type-json');
+const { GraphQLJSON } = require('graphql-type-json');
+
 
 const { getTypeDef } = require('./generateTypeDefs');
 const { init, generateType, getNodeDefinitions } = require('./generateType');

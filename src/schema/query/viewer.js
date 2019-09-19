@@ -81,10 +81,6 @@ function getMeField(User) {
  * @param {*} models
  */
 module.exports = function viewer(models, options) {
-  if (options.disableViewer) {
-    return;
-  }
-
   const opts = Object.assign({}, {
     UserModel: 'User',
   }, options.viewer || {});
