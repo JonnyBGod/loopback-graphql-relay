@@ -64,7 +64,7 @@ const processIdField = (name, type) => {
     return;
   }
 
-  const idFieldName = models[name].getIdName();
+  const idFieldName = typeof models[name].getIdName !== 'undefined' ? models[name].getIdName() : undefined;
   const idField = _.find(type.meta.fields, (f, i) => i === idFieldName);
 
   if (_.isNil(idField)) {

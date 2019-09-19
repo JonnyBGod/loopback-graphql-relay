@@ -22,7 +22,7 @@ module.exports = function subscriptionWithPayload({
   model,
   options,
 }) {
-  const idName = (model && model.getIdName()) ? model.getIdName() : 'id';
+  const idName = (model && typeof model.getIdName !== 'undefined') ? model.getIdName() : 'id';
   const method = model.sharedClass.methods().filter(m => m.name === 'findOne');
 
   const inputType = new GraphQLInputObjectType({

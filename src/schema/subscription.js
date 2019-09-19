@@ -19,7 +19,7 @@ function addModel(model, options) {
 
 module.exports = function subscriptions(models, options) {
   const fields = {};
-  _.forEach(models.filter(m => m.config.public), (model) => {
+  _.forEach(models.filter(m => typeof m.config === 'undefined' || m.config.public), (model) => {
     if (!model.shared) {
       return;
     }

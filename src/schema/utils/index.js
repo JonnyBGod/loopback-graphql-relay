@@ -22,7 +22,7 @@ const exchangeTypes = {
  * @param {*} allowedVerbs
  */
 function isRemoteMethodAllowed(method, allowedVerbs) {
-  if (!method.ctor.config.public) {
+  if (method.ctor.config && !method.ctor.config.public) {
     return false;
   }
   if (!method.shared) {

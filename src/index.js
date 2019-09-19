@@ -12,7 +12,7 @@ module.exports = function index(app, options) {
   let models = app.models();
 
   if (options.ignoreModels && options.ignoreModels.length > 0) {
-    models = models.filter(m => options.ignoreModels.indexOf(m.modelName) === -1)
+    models = models.filter(m => options.ignoreModels.indexOf(m.modelName) === -1);
   }
 
   if (!options.subscriptionServer) {
@@ -22,9 +22,14 @@ module.exports = function index(app, options) {
   if (options.subscriptionServer.disabled !== true) {
     options.subscriptionServer.pubsub = options.subscriptionServer.pubsub || new PubSub();
 
-    _.forEach(models.filter(m => m.config.public), (model) => {
-      patchModelForSubscriptions(model, options);
-    });
+    _.forEach(
+      models
+        .filter(m => typeof m.getIdName !== 'undefined')
+        .filter(m => typeof m.config === 'undefined' || m.config.public),
+      (model) => {
+        patchModelForSubscriptions(model, options);
+      },
+    );
   }
 
   const schema = getSchema(models, options);
