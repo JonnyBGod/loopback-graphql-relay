@@ -9,7 +9,11 @@ const https = require('https');
 const patchModelForSubscriptions = require('./subscriptions/patchModelForSubscriptions');
 
 module.exports = function index(app, options) {
-  const models = app.models();
+  let models = app.models();
+
+  if (options.ignoreModels && options.ignoreModels.length > 0) {
+    models = models.filter(m => options.ignoreModels.indexOf(m.modelName) === -1)
+  }
 
   if (!options.subscriptionServer) {
     options.subscriptionServer = {};
