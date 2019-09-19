@@ -28,7 +28,7 @@ module.exports = function subscriptions(models, options) {
   });
 
   return new GraphQLObjectType({
-    name: 'Subscription',
+    name: options.subscriptionServer.typeName || 'Subscription',
     fields,
   });
 };
