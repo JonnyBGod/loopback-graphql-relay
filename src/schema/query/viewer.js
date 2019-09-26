@@ -87,6 +87,10 @@ module.exports = function viewer(models, options) {
 
   const User = _.find(models, model => model.modelName === opts.UserModel);
 
+  if (typeof User === 'undefined') {
+    return undefined;
+  }
+
   const Viewer = {
     resolve: () => ({}),
     type: new GraphQLObjectType({
