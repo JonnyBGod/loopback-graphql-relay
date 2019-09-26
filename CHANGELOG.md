@@ -1,6 +1,18 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### [2.1.9](https://github.com/BlueEastCode/loopback-graphql-relay/compare/v2.1.8...v2.1.9) (2019-09-26)
+
+
+### Bug Fixes
+
+* **core:** add option 'subscriptionServer.typeName' ([230a353](https://github.com/BlueEastCode/loopback-graphql-relay/commit/230a353))
+* **core:** add option to 'disableViewer' ([f4aaf81](https://github.com/BlueEastCode/loopback-graphql-relay/commit/f4aaf81))
+* **core:** add option to 'ignoreModels' ([daefb70](https://github.com/BlueEastCode/loopback-graphql-relay/commit/daefb70))
+* **core:** minor validation fixes ([ae79006](https://github.com/BlueEastCode/loopback-graphql-relay/commit/ae79006))
+* **core:** skip viewer when model is not found ([0a22264](https://github.com/BlueEastCode/loopback-graphql-relay/commit/0a22264))
+* **core:** update dependencies ([cb66a60](https://github.com/BlueEastCode/loopback-graphql-relay/commit/cb66a60))
 
 <a name="2.1.8"></a>
 ## [2.1.8](https://github.com/BlueEastCode/loopback-graphql-relay/compare/v2.1.7...v2.1.8) (2019-03-15)
