@@ -32,14 +32,26 @@ function generateModelFields(models) {
 }
 
 module.exports = function index(models, options) {
-  const fields = Object.assign(
-    {},
-    {
-      node: getType('node'),
-      viewer: options.disableViewer ? undefined : generateViewer(models, options),
-    },
-    generateModelFields(models),
-  );
+  let baseFields = {
+    node: getType('node'),
+  };
+
+  if (!options.disableViewer) {
+    const viewer = generateViewer(models, options);
+
+    if (viewer) {
+      baseFields = {
+        ...baseFields,
+        viewer,
+      };
+    }
+  }
+
+  const fields = {
+    ...baseFields,
+    ...generateModelFields(models),
+  };
+
 
   return new GraphQLObjectType({
     name: 'Query',
