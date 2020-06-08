@@ -1,9 +1,14 @@
-
 const _ = require('lodash');
 const utils = require('./utils');
+const promisify = require('promisify-node');
 
-function connectionFromArray(obj, args, model) {
-  const idName = (model && model.getIdName()) ? model.getIdName() : 'id';
+async function connectionFromArray(data, args, model) {
+  const obj = data instanceof Array ? {
+    count: await promisify(model.count(args && args.filter && args.filter.where)),
+    list: data,
+  } : data;
+
+  const idName = (model && model.getIdName instanceof Function) ? model.getIdName() : 'id';
 
   const res = {
     totalCount: obj.count,
@@ -35,8 +40,8 @@ function connectionFromArray(obj, args, model) {
   return res;
 }
 
-function connectionFromPromisedArray(dataPromise, args) {
-  return dataPromise.then(data => connectionFromArray(data, args));
+function connectionFromPromisedArray(dataPromise, args, model) {
+  return dataPromise.then(data => connectionFromArray(data, args, model));
 }
 
 module.exports = {

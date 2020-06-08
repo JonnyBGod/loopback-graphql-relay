@@ -3,7 +3,7 @@ const _ = require('lodash');
 
 const promisify = require('promisify-node');
 const utils = require('../utils');
-const { connectionFromPromisedArray } = require('graphql-relay');
+const { connectionFromPromisedArray } = require('../../db/resolveConnection');
 
 const checkAccess = require('../acl');
 
@@ -61,8 +61,6 @@ module.exports = function getRemoteMethodQueries(model) {
                     params.push(args[accept.arg]);
                   });
                 }
-
-                args.count = await promisify(model.count(params.where));
 
                 result = await connectionFromPromisedArray(wrap.apply(model, params), args, model);
               } else {
