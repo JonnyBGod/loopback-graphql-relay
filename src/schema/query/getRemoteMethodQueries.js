@@ -62,6 +62,8 @@ module.exports = function getRemoteMethodQueries(model) {
                   });
                 }
 
+                args.count = await promisify(model.count(params.where));
+
                 result = await connectionFromPromisedArray(wrap.apply(model, params), args, model);
               } else {
                 result = await wrap.apply(model, params);
